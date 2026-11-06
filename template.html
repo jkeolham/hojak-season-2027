@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2027 쭈갑시즌 예약 추천일 — Hojak</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1620">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="180x180" href="favicon-180.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Gowun+Dodum&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --ink: #0f1620;
+    --surface: #1a2433;
+    --surface-2: #212d40;
+    --surface-3: #2a3950;
+    --line: #2c3a4f;
+    --text: #e8edf4;
+    --text-dim: #93a3b8;
+    --accent: #e3a94c;
+    --accent-dim: #c98f38;
+    --squid: #cf8f66;
+    --cuttle: #4a9b8f;
+    --good: #7ab975;
+    --warn: #c3604d;
+    --holiday: #e06c75;
+    --candidate: #e3a94c;
+    --shadow: 0 16px 40px -16px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+  .disp { font-family: 'Song Myung', serif; }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  /* 헤더 마스트헤드 */
+  .masthead { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .masthead h1 {
+    font-size: 30px;
+    margin: 2px 0;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .masthead h1 img { width: 36px; height: 36px; border-radius: 8px; vertical-align: middle; }
+  .sub { color: var(--text-dim); font-size: 14.5px; line-height: 1.5; margin: 0; }
+
+  /* 통계 요약 타일 */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 16px 0 24px;
+  }
+  @media (max-width: 680px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .stat-tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-tile .val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; }
+  .stat-tile .lbl { font-size: 11.5px; color: var(--text-dim); }
+  .stat-tile.gold .val { color: var(--accent); }
+  .stat-tile.candidate-tile {
+    border-color: rgba(227, 169, 76, 0.4);
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  }
+  .stat-tile.candidate-tile .val { color: var(--accent); }
+
+  /* 월 이동 버튼 */
+  .month-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .month-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all .16s ease;
+    white-space: nowrap;
+  }
+  .month-btn:hover { color: var(--text); background: var(--surface-2); }
+  .month-btn.active {
+    color: var(--text);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+  }
+
+  /* 필터 탭 */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .16s ease;
+  }
+  .filter-btn:hover { color: var(--text); border-color: var(--text-dim); }
+  .filter-btn.active {
+    color: var(--ink);
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .filter-btn .badge {
+    background: rgba(0,0,0,0.18);
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  /* 캘린더 컨테이너 */
+  .calendar-container { margin-bottom: 30px; }
+  .cal-month-header {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 24px 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cal-month-header .month-tag { font-size: 12px; font-weight: normal; color: var(--text-dim); }
+
+  /* 캘린더 그리드 */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+  .cal-day-header {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    padding: 6px 0;
+  }
+  .cal-day-header.sun { color: var(--holiday); }
+  .cal-day-header.sat { color: #61afef; }
+
+  /* 날짜 셀 */
+  .day-cell {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    min-height: 100px;
+    padding: 8px 7px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    transition: all .18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .day-cell:hover {
+    border-color: var(--text-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  }
+
+  /* 빈 패딩 셀 */
+  .day-cell.empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+  }
+  .day-cell.empty:hover { transform: none; box-shadow: none; border-color: transparent; }
+
+  /* 주말 및 공휴일 스타일 */
+  .day-cell.is-weekend .day-num { color: #61afef; }
+  .day-cell.is-sun .day-num,
+  .day-cell.is-holiday .day-num { color: var(--holiday); }
+  .day-cell.is-holiday {
+    border-color: rgba(224, 108, 117, 0.4);
+    background: color-mix(in srgb, var(--holiday) 6%, var(--surface));
+  }
+
+  /* 🌟 S등급 초황금일 */
+  .day-cell.tier-S {
+    border-color: rgba(227, 169, 76, 0.55);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  }
+
+  /* 📌 예약 후보군 선택 상태 (원터치 탭!) */
+  .day-cell.is-candidate {
+    border: 2px solid var(--candidate) !important;
+    background: color-mix(in srgb, var(--candidate) 18%, var(--surface)) !important;
+    box-shadow: 0 0 16px rgba(227, 169, 76, 0.5) !important;
+    transform: translateY(-2px);
+  }
+  .day-cell.is-candidate .candidate-badge {
+    display: inline-flex !important;
+  }
+
+  /* 셀 상단: 날짜 + 음력 + 뱃지 */
+  .cell-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .day-num { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; line-height: 1; }
+  .lunar-text { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .cell-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+
+  .candidate-badge {
+    display: none;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--candidate);
+    padding: 1px 4px;
+    border-radius: 4px;
+    letter-spacing: -.02em;
+  }
+  .holiday-tag {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--holiday);
+    padding: 1px 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .tier-tag { font-size: 11px; }
+
+  /* 셀 중앙: 물때 뱃지 */
+  .cell-mid { margin: 6px 0 4px; }
+  .tide-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .tide-badge.slack { background: #3b2d54; color: #d1b3ff; } /* 조금/무시 */
+  .tide-badge.gold  { background: #1a4238; color: #6ee7b7; } /* 1~4물 (쭈 황금) */
+  .tide-badge.speed { background: #233854; color: #93c5fd; } /* 9~12물 (갑 스윗스팟) */
+  .tide-badge.surge { background: #4a2d24; color: #fca5a5; } /* 6~8물 (사리) */
+
+  /* 셀 하단: 조위차 게이지 & info 아이콘 */
+  .cell-bot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .diff-text { font-family: 'JetBrains Mono', monospace; }
+  .info-icon {
+    font-size: 12px;
+    color: var(--text-dim);
+    padding: 2px;
+    border-radius: 4px;
+    transition: color .14s ease;
+  }
+  .info-icon:hover { color: var(--accent); }
+
+  /* 필터링 숨김 클래스 */
+  .day-cell.filter-hide {
+    opacity: 0.18;
+    filter: grayscale(80%);
+    pointer-events: auto;
+  }
+
+  /* TOP 15 랭킹 리스트 뷰 */
+  .ranking-view { display: none; }
+  .ranking-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    transition: all .16s ease;
+  }
+  .ranking-card:hover { border-color: var(--accent-dim); background: var(--surface-2); }
+  .ranking-card.is-candidate {
+    border-color: var(--candidate);
+    background: color-mix(in srgb, var(--candidate) 10%, var(--surface));
+  }
+  .rank-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .rank-body { flex: 1; }
+  .rank-title {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .rank-meta { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
+  .rank-action { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .btn-fav {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all .14s ease;
+  }
+  .btn-fav:hover { border-color: var(--accent); }
+  .btn-fav.active {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+
+  /* 상세 분석 모달 */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-content {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    position: relative;
+    animation: modalSlideUp .22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: var(--surface-2);
+    border: none;
+    color: var(--text-dim);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .modal-header { margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .modal-title { font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+  .modal-scores { display: flex; gap: 10px; margin: 14px 0; }
+  .score-chip {
+    flex: 1;
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .score-chip .v { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: var(--accent); }
+  .score-chip .l { font-size: 11px; color: var(--text-dim); }
+
+  .modal-section { margin-bottom: 16px; }
+  .modal-section h4 { margin: 0 0 8px; font-size: 13.5px; color: var(--accent); }
+  .modal-section p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--text); }
+
+  .boat-links-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .boat-link-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    text-decoration: none;
+    text-align: center;
+    transition: all .14s ease;
+  }
+  .boat-link-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .candidate-toggle-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    transition: all .16s ease;
+  }
+  .candidate-toggle-btn.active {
+    background: var(--accent);
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- 마스트헤드 -->
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>HOJAK SEASON 2027</span>
+      <span>·</span>
+      <span>서해 경기만 91일 캘린더</span>
+    </div>
+    <h1>
+      <img src="icon-192.png" alt="호작 아이콘">
+      <span>2027 쭈갑시즌 예약 추천일</span>
+    </h1>
+    <p class="sub">
+      9월~11월 91일간의 음력·물때·조위·추석 연휴 전수 교차분석. 날짜를 탭하여 <b>나만의 예약 후보군</b>을 담아두세요.
+    </p>
+  </header>
+
+  <!-- 통계 요약 타일 -->
+  <section class="stat-grid">
+    <div class="stat-tile">
+      <div class="val num">91일</div>
+      <div class="lbl">시즌 총 일정 (9/1~11/30)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="val num">31일</div>
+      <div class="lbl">주말 및 법정 공휴일</div>
+    </div>
+    <div class="stat-tile gold">
+      <div class="val num">23일</div>
+      <div class="lbl">S등급 초황금 출조일</div>
+    </div>
+    <div class="stat-tile candidate-tile">
+      <div class="val num" id="candidateCount">0일</div>
+      <div class="lbl">📌 내가 찜한 예약 후보군</div>
+    </div>
+  </section>
+
+  <!-- 필터 탭 바 -->
+  <nav class="filter-bar">
+    <button class="filter-btn active" data-filter="all">전체 캘린더</button>
+    <button class="filter-btn" data-filter="candidate">
+      <span>📌 나의 예약 후보군</span>
+      <span class="badge num" id="candidateBadge">0</span>
+    </button>
+    <button class="filter-btn" data-filter="jjuk">🎣 쭈꾸미 황금일 (약한물)</button>
+    <button class="filter-btn" data-filter="gap">🦑 갑오징어 황금일 (스윗스팟)</button>
+    <button class="filter-btn" data-filter="top15">🏆 주말·연휴 TOP 15</button>
+  </nav>
+
+  <!-- 월 네비게이션 (캘린더 뷰일 때) -->
+  <div class="month-nav" id="monthNav">
+    <button class="month-btn active" data-month="2027-09">9월 (시즌개막·추석대연휴)</button>
+    <button class="month-btn" data-month="2027-10">10월 (피크·개천절/한글날)</button>
+    <button class="month-btn" data-month="2027-11">11월 (신발짝 대물 찬스)</button>
+  </div>
+
+  <!-- 캘린더 뷰 컨테이너 -->
+  <main class="calendar-container" id="calendarView">
+    <!-- 9월 / 10월 / 11월 섹션들이 JavaScript로 렌더링됨 -->
+    <div id="calendarMount"></div>
+  </main>
+
+  <!-- TOP 15 랭킹 리스트 뷰 컨테이너 -->
+  <section class="ranking-view" id="rankingView">
+    <div class="cal-month-header">
+      <span>🏆 2027 쭈갑시즌 광클 예약 필수 TOP 15</span>
+      <span class="month-tag">예약 오픈 시 가장 먼저 선점해야 할 날짜 순위</span>
+    </div>
+    <div id="rankingMount"></div>
+  </section>
+</div>
+
+<!-- 상세 분석 팝업 모달 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">2027-09-11 (토)</h3>
+      <div id="modalSubtitle" style="color:var(--text-dim); font-size:13px;">음력 8.11 · 2물</div>
+    </div>
+
+    <!-- 후보군 등록 토글 버튼 -->
+    <button class="candidate-toggle-btn" id="modalCandidateBtn" onclick="toggleModalCandidate()">
+      <span>📌 예약 후보군에 등록하기</span>
+    </button>
+
+    <div class="modal-scores">
+      <div class="score-chip">
+        <div class="v" id="modalJjukScore">100</div>
+        <div class="l">쭈꾸미 적합도</div>
+      </div>
+      <div class="score-chip">
+        <div class="v" id="modalGapScore">95</div>
+        <div class="l">갑오징어 적합도</div>
+      </div>
+      <div class="score-chip">
+        <div class="v" id="modalTier">S</div>
+        <div class="l">추천 티어</div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h4>💡 출조 및 예약 핵심 가이드</h4>
+      <p id="modalAdvice">-</p>
+    </div>
+
+    <div class="modal-section">
+      <h4>🌊 물때 및 조위 정보 (영흥도 기준)</h4>
+      <p id="modalTideDetail">-</p>
+    </div>
+
+    <div class="modal-section">
+      <h4>⚓ 선사 바로가기 (원클릭 예약 연결)</h4>
+      <div class="boat-links-grid">
+        <a class="boat-link-btn" href="https://jkeolham.github.io/hojak-boats/" target="_blank" rel="noopener">선사정보 통합 바로가기</a>
+        <a class="boat-link-btn" href="https://www.sunsang24.com" target="_blank" rel="noopener">선상24 전체 선박</a>
+        <a class="boat-link-btn" href="https://kungpyeong.com" target="_blank" rel="noopener">궁평항 피싱클럽</a>
+        <a class="boat-link-btn" href="https://thefishing.kr" target="_blank" rel="noopener">더피싱 예약센터</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 빌더에 의해 주입될 2027 데이터
+  const SEASON_DATA = /* [[DATA_JSON]] */ null;
+
+  // localStorage 키
+  const STORAGE_KEY = 'hojak_candidates_2027';
+
+  // 상태 관리
+  let candidateSet = new Set();
+  let currentFilter = 'all';
+  let currentMonth = '2027-09';
+  let selectedModalDate = null;
+
+  // 초기화
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCandidates();
+    initFilterNav();
+    initMonthNav();
+    renderCalendar();
+    renderRanking();
+    updateCandidateUI();
+  });
+
+  // 로컬스토리지 로드
+  function loadCandidates() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const arr = JSON.parse(saved);
+        candidateSet = new Set(arr);
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  // 로컬스토리지 저장
+  function saveCandidates() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...candidateSet]));
+    } catch(e) {
+      console.error(e);
+    }
+    updateCandidateUI();
+  }
+
+  // 후보군 카운트 및 UI 동기화
+  function updateCandidateUI() {
+    const count = candidateSet.size;
+    const countEl = document.getElementById('candidateCount');
+    const badgeEl = document.getElementById('candidateBadge');
+    if (countEl) countEl.textContent = `${count}일`;
+    if (badgeEl) badgeEl.textContent = count;
+
+    // 캘린더 셀 상태 동기화
+    document.querySelectorAll('.day-cell[data-date]').forEach(cell => {
+      const date = cell.dataset.date;
+      if (candidateSet.has(date)) {
+        cell.classList.add('is-candidate');
+      } else {
+        cell.classList.remove('is-candidate');
+      }
+    });
+
+    // 랭킹 카드 상태 동기화
+    document.querySelectorAll('.ranking-card[data-date]').forEach(card => {
+      const date = card.dataset.date;
+      const btn = card.querySelector('.btn-fav');
+      if (candidateSet.has(date)) {
+        card.classList.add('is-candidate');
+        if (btn) {
+          btn.classList.add('active');
+          btn.textContent = '📌 후보 등록됨';
+        }
+      } else {
+        card.classList.remove('is-candidate');
+        if (btn) {
+          btn.classList.remove('active');
+          btn.textContent = '📌 후보 담기';
+        }
+      }
+    });
+
+    // 만약 'candidate' 필터 중이면 재필터링
+    if (currentFilter === 'candidate') {
+      applyFilter();
+    }
+  }
+
+  // 원터치 날짜 셀 토글 (핵심 요구사항!)
+  function toggleCandidate(dateStr, event) {
+    // 만약 info 아이콘을 클릭한 것이면 모달만 열기
+    if (event && event.target.closest('.info-icon')) {
+      openModal(dateStr);
+      return;
+    }
+
+    if (candidateSet.has(dateStr)) {
+      candidateSet.delete(dateStr);
+    } else {
+      candidateSet.add(dateStr);
+    }
+    saveCandidates();
+  }
+
+  // 필터 네비게이션 초기화
+  function initFilterNav() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        applyFilter();
+      });
+    });
+  }
+
+  // 월 네비게이션 초기화
+  function initMonthNav() {
+    document.querySelectorAll('.month-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMonth = btn.dataset.month;
+        showMonthCalendar(currentMonth);
+      });
+    });
+  }
+
+  // 필터 적용
+  function applyFilter() {
+    const calView = document.getElementById('calendarView');
+    const rankView = document.getElementById('rankingView');
+    const monthNav = document.getElementById('monthNav');
+
+    if (currentFilter === 'top15') {
+      calView.style.display = 'none';
+      monthNav.style.display = 'none';
+      rankView.style.display = 'block';
+      return;
+    }
+
+    calView.style.display = 'block';
+    monthNav.style.display = 'flex';
+    rankView.style.display = 'none';
+
+    document.querySelectorAll('.day-cell[data-date]').forEach(cell => {
+      const date = cell.dataset.date;
+      const jjuk = parseInt(cell.dataset.jjuk, 10);
+      const gap = parseInt(cell.dataset.gap, 10);
+      const isCand = candidateSet.has(date);
+
+      let match = true;
+      if (currentFilter === 'candidate') {
+        match = isCand;
+      } else if (currentFilter === 'jjuk') {
+        match = jjuk >= 85;
+      } else if (currentFilter === 'gap') {
+        match = gap >= 85;
+      }
+
+      if (match) {
+        cell.classList.remove('filter-hide');
+      } else {
+        cell.classList.add('filter-hide');
+      }
+    });
+  }
+
+  // 특정 월 캘린더 표시
+  function showMonthCalendar(ym) {
+    document.querySelectorAll('.month-calendar-block').forEach(block => {
+      if (block.dataset.ym === ym) {
+        block.style.display = 'block';
+      } else {
+        block.style.display = 'none';
+      }
+    });
+  }
+
+  // 캘린더 렌더링
+  function renderCalendar() {
+    if (!SEASON_DATA || !SEASON_DATA.days) return;
+    const mount = document.getElementById('calendarMount');
+    mount.innerHTML = '';
+
+    const months = ['2027-09', '2027-10', '2027-11'];
+    const monthNames = {
+      '2027-09': '2027년 9월 (시즌 개막 · 추석 대황금연휴)',
+      '2027-10': '2027년 10월 (가을 피크 · 개천절/한글날 3연휴)',
+      '2027-11': '2027년 11월 (신발짝 몬스터 대물 찬스)'
+    };
+
+    months.forEach((ym, idx) => {
+      const monthDays = SEASON_DATA.days.filter(d => d.date.startsWith(ym));
+      const block = document.createElement('div');
+      block.className = 'month-calendar-block';
+      block.dataset.ym = ym;
+      if (idx !== 0) block.style.display = 'none';
+
+      // 월 타이틀
+      const header = document.createElement('div');
+      header.className = 'cal-month-header';
+      header.innerHTML = `<span>${monthNames[ym]}</span><span class="month-tag">${monthDays.length}일</span>`;
+      block.appendChild(header);
+
+      // 그리드
+      const grid = document.createElement('div');
+      grid.className = 'cal-grid';
+
+      // 요일 헤더
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      weekdays.forEach(w => {
+        const dh = document.createElement('div');
+        dh.className = `cal-day-header ${w === '일' ? 'sun' : w === '토' ? 'sat' : ''}`;
+        dh.textContent = w;
+        grid.appendChild(dh);
+      });
+
+      // 첫날 요일에 맞춘 빈 셀
+      const firstDate = new Date(`${monthDays[0].date}T00:00:00`);
+      const firstDayIndex = firstDate.getDay(); // 0(일) ~ 6(토)
+      for (let i = 0; i < firstDayIndex; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day-cell empty';
+        grid.appendChild(empty);
+      }
+
+      // 날짜 셀 채우기
+      monthDays.forEach(d => {
+        const cell = document.createElement('div');
+        const isSun = d.weekday === '일';
+        const isSat = d.weekday === '토';
+        const isCandidate = candidateSet.has(d.date);
+
+        cell.className = `day-cell ${d.is_weekend ? 'is-weekend' : ''} ${isSun ? 'is-sun' : ''} ${d.is_holiday ? 'is-holiday' : ''} tier-${d.tier} ${isCandidate ? 'is-candidate' : ''}`;
+        cell.dataset.date = d.date;
+        cell.dataset.jjuk = d.score_jjuk;
+        cell.dataset.gap = d.score_gap;
+
+        // 물때 클래스
+        let tideClass = 'slack';
+        if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'slack';
+        else if (d.tide_num >= 1 && d.tide_num <= 4) tideClass = 'gold';
+        else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
+        else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
+
+        // 티어 아이콘
+        const tierIcon = d.tier === 'S' ? '🌟' : d.tier === 'A' ? '✨' : '';
+
+        cell.innerHTML = `
+          <div class="cell-top">
+            <div>
+              <div class="day-num num">${d.day}</div>
+              <div class="lunar-text num">음 ${d.lunar}</div>
+            </div>
+            <div class="cell-badges">
+              <span class="candidate-badge">📌 후보</span>
+              ${d.holiday_name ? `<span class="holiday-tag">${d.holiday_name}</span>` : ''}
+              ${tierIcon ? `<span class="tier-tag">${tierIcon}</span>` : ''}
+            </div>
+          </div>
+          <div class="cell-mid">
+            <span class="tide-badge ${tideClass}">${d.tide_name}</span>
+          </div>
+          <div class="cell-bot">
+            <span class="diff-text num">${d.tide_diff ? `${d.tide_diff}cm` : ''}</span>
+            <span class="info-icon" title="상세보기">ℹ️</span>
+          </div>
+        `;
+
+        // 탭 토글 클릭 리스너 연결
+        cell.addEventListener('click', (e) => toggleCandidate(d.date, e));
+
+        grid.appendChild(cell);
+      });
+
+      block.appendChild(grid);
+      mount.appendChild(block);
+    });
+  }
+
+  // TOP 15 랭킹 렌더링
+  function renderRanking() {
+    if (!SEASON_DATA || !SEASON_DATA.top_15) return;
+    const mount = document.getElementById('rankingMount');
+    mount.innerHTML = '';
+
+    SEASON_DATA.top_15.forEach(item => {
+      const card = document.createElement('div');
+      const isCand = candidateSet.has(item.date);
+      card.className = `ranking-card ${isCand ? 'is-candidate' : ''}`;
+      card.dataset.date = item.date;
+
+      card.innerHTML = `
+        <div class="rank-badge">${item.rank}</div>
+        <div class="rank-body">
+          <div class="rank-title">
+            <span>${item.date} (${item.weekday})</span>
+            <span class="tide-badge gold">${item.tide_name}</span>
+            ${item.holiday_name ? `<span class="holiday-tag">${item.holiday_name}</span>` : ''}
+            <span>${item.tier === 'S' ? '🌟 S등급' : '✨ A등급'}</span>
+          </div>
+          <div class="rank-meta">
+            <span>🎣 쭈꾸미 <b>${item.score_jjuk}점</b> · 🦑 갑오징어 <b>${item.score_gap}점</b></span><br>
+            <span>${item.advice}</span>
+          </div>
+        </div>
+        <div class="rank-action">
+          <button class="btn-fav ${isCand ? 'active' : ''}" onclick="toggleCandidate('${item.date}')">
+            ${isCand ? '📌 후보 등록됨' : '📌 후보 담기'}
+          </button>
+          <button class="btn-fav" onclick="openModal('${item.date}')">상세</button>
+        </div>
+      `;
+
+      mount.appendChild(card);
+    });
+  }
+
+  // 모달 오픈
+  function openModal(dateStr) {
+    if (!SEASON_DATA || !SEASON_DATA.days) return;
+    const d = SEASON_DATA.days.find(x => x.date === dateStr);
+    if (!d) return;
+
+    selectedModalDate = dateStr;
+    const modal = document.getElementById('detailModal');
+    document.getElementById('modalTitle').textContent = `${d.date} (${d.weekday})`;
+    document.getElementById('modalSubtitle').textContent = `음력 ${d.lunar} · ${d.tide_name} ${d.holiday_name ? `· ${d.holiday_name}` : ''}`;
+    document.getElementById('modalJjukScore').textContent = d.score_jjuk;
+    document.getElementById('modalGapScore').textContent = d.score_gap;
+    document.getElementById('modalTier').textContent = d.tier;
+    document.getElementById('modalAdvice').textContent = d.advice;
+
+    let tideDetail = `조위차: ${d.tide_diff}cm | 일출: ${d.sunrise || '-'} / 일몰: ${d.sunset || '-'}`;
+    if (d.tide_events && d.tide_events.length > 0) {
+      const evStr = d.tide_events.map(e => `${e.time} (${e.height}cm ${e.type === 'high' ? '만조▲' : '간조▼'})`).join(' · ');
+      tideDetail += `<br>조위 타임라인: ${evStr}`;
+    }
+    document.getElementById('modalTideDetail').innerHTML = tideDetail;
+
+    updateModalCandidateBtn();
+    modal.classList.add('open');
+  }
+
+  // 모달 닫기
+  function closeModal() {
+    document.getElementById('detailModal').classList.remove('open');
+  }
+
+  // 모달 내 후보 버튼 상태
+  function updateModalCandidateBtn() {
+    const btn = document.getElementById('modalCandidateBtn');
+    if (!btn || !selectedModalDate) return;
+    if (candidateSet.has(selectedModalDate)) {
+      btn.classList.add('active');
+      btn.innerHTML = '<span>📌 예약 후보군에서 해제하기</span>';
+    } else {
+      btn.classList.remove('active');
+      btn.innerHTML = '<span>📌 예약 후보군에 등록하기</span>';
+    }
+  }
+
+  // 모달 내 후보 토글
+  function toggleModalCandidate() {
+    if (!selectedModalDate) return;
+    toggleCandidate(selectedModalDate);
+    updateModalCandidateBtn();
+  }
+
+  // 모달 배경 클릭 닫기
+  document.getElementById('detailModal').addEventListener('click', (e) => {
+    if (e.target.id === 'detailModal') closeModal();
+  });
+</script>
+</body>
+</html>

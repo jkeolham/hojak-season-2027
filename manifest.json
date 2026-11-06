@@ -1,0 +1,20 @@
+{
+  "name": "2027 쭈갑시즌 예약 추천일 — Hojak",
+  "short_name": "2027 쭈갑",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1620",
+  "theme_color": "#0f1620",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
