@@ -371,6 +371,62 @@
     border-color: var(--accent);
   }
 
+  /* 나의 예약 후보군 전용 뷰 */
+  .candidate-view { display: none; }
+  .candidate-header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn-action-cand {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all .14s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-action-cand:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-action-cand.danger:hover { border-color: #e06249; color: #e06249; }
+  .empty-cand-notice {
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  .empty-cand-notice .icon { font-size: 32px; margin-bottom: 8px; display: block; }
+
+  /* 토스트 알림 */
+  .toast-banner {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: #0f1620;
+    border: 1px solid var(--accent);
+    color: #e8edf4;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .toast-banner.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   /* 상세 분석 모달 */
   .modal-overlay {
     display: none;
@@ -543,7 +599,26 @@
     </div>
     <div id="rankingMount"></div>
   </section>
+
+  <!-- 나의 예약 후보군 전용 리스트 뷰 컨테이너 -->
+  <section class="candidate-view" id="candidateView">
+    <div class="cal-month-header">
+      <div>
+        <span>📌 나의 예약 후보군 전체 목록</span>
+        <span class="month-tag" id="candidateViewSubtitle">0일 선택됨</span>
+      </div>
+      <div class="candidate-header-actions">
+        <button class="btn-action-cand" onclick="copyCandidatesList()" title="후보 날짜 목록을 클립보드에 복사">📋 목록 복사</button>
+        <button class="btn-action-cand" onclick="copyShareUrl()" title="후보군이 포함된 공유 링크 복사">🔗 링크 공유</button>
+        <button class="btn-action-cand danger" onclick="clearCandidatesList()" title="선택된 모든 후보 해제">✕ 전체 해제</button>
+      </div>
+    </div>
+    <div id="candidateMount"></div>
+  </section>
 </div>
+
+<!-- 하단 토스트 알림 배너 -->
+<div id="toastBanner" class="toast-banner">알림 메시지</div>
 
 <!-- 상세 분석 팝업 모달 -->
 <div class="modal-overlay" id="detailModal">
@@ -600,7 +675,7 @@
   // 빌더에 의해 주입될 2027 데이터
   const SEASON_DATA = /* [[DATA_JSON]] */ null;
 
-  // localStorage 키
+  // localStorage 및 Cookie 키
   const STORAGE_KEY = 'hojak_candidates_2027';
 
   // 상태 관리
@@ -608,37 +683,146 @@
   let currentFilter = 'all';
   let currentMonth = '2027-09';
   let selectedModalDate = null;
+  let toastTimer = null;
 
-  // 초기화
-  document.addEventListener('DOMContentLoaded', () => {
-    loadCandidates();
-    initFilterNav();
-    initMonthNav();
-    renderCalendar();
-    renderRanking();
-    updateCandidateUI();
-  });
+  // 토스트 메시지 헬퍼
+  function showToast(message) {
+    const toast = document.getElementById('toastBanner');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2400);
+  }
 
-  // 로컬스토리지 로드
+  // 쿠키 쓰기 헬퍼 (1년 365일 보존)
+  function setCookie(name, value, days = 365) {
+    try {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)};${expires};path=/;SameSite=Lax`;
+    } catch(e) {
+      console.warn('[cookie] set error:', e);
+    }
+  }
+
+  // 쿠키 읽기 헬퍼
+  function getCookie(name) {
+    try {
+      const cname = name + "=";
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(cname) === 0) {
+          return c.substring(cname.length, c.length);
+        }
+      }
+    } catch(e) {
+      console.warn('[cookie] get error:', e);
+    }
+    return "";
+  }
+
+  // 로컬스토리지 + 쿠키 + URL 3중 로드 (Triple Defense)
   function loadCandidates() {
+    const dates = new Set();
+    let hasLoaded = false;
+
+    // 1. URL 해시 또는 파라미터에서 먼저 확인 (?cand= 또는 #cand=)
+    try {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      let urlCand = null;
+      if (search.includes('cand=')) {
+        const params = new URLSearchParams(search);
+        urlCand = params.get('cand');
+      } else if (hash.includes('cand=')) {
+        const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
+        const params = new URLSearchParams(hashStr);
+        urlCand = params.get('cand');
+      }
+      if (urlCand) {
+        const parts = urlCand.split(',').map(s => s.trim()).filter(Boolean);
+        parts.forEach(d => dates.add(d));
+        if (parts.length > 0) hasLoaded = true;
+      }
+    } catch(e) {
+      console.warn('[url] load error:', e);
+    }
+
+    // 2. localStorage에서 로드
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const arr = JSON.parse(saved);
-        candidateSet = new Set(arr);
+        if (Array.isArray(arr)) {
+          arr.forEach(d => dates.add(d));
+          if (arr.length > 0) hasLoaded = true;
+        }
       }
     } catch(e) {
-      console.error(e);
+      console.warn('[localStorage] read error:', e);
+    }
+
+    // 3. Cookie에서 보조 로드 (Dual Storage)
+    try {
+      const cookieVal = getCookie(STORAGE_KEY);
+      if (cookieVal) {
+        const arr = JSON.parse(cookieVal);
+        if (Array.isArray(arr)) {
+          arr.forEach(d => dates.add(d));
+          if (arr.length > 0) hasLoaded = true;
+        }
+      }
+    } catch(e) {
+      console.warn('[cookie] read error:', e);
+    }
+
+    candidateSet = dates;
+
+    // 한 쪽에만 남아있고 다른 쪽에 없던 경우 즉시 양쪽 동기화 저장
+    if (hasLoaded) {
+      syncStorageOnly();
     }
   }
 
-  // 로컬스토리지 저장
-  function saveCandidates() {
+  // 스토리지 전용 동기화 (UI 리렌더링 없이 저장만 수행)
+  function syncStorageOnly() {
+    const arr = [...candidateSet].sort();
+    const jsonStr = JSON.stringify(arr);
+
+    // 1. localStorage 저장
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...candidateSet]));
+      localStorage.setItem(STORAGE_KEY, jsonStr);
     } catch(e) {
-      console.error(e);
+      console.warn('[localStorage] save error:', e);
     }
+
+    // 2. Cookie 동기화 (365일 보존)
+    setCookie(STORAGE_KEY, jsonStr, 365);
+
+    // 3. URL Hash 동기화 (히스토리 오염 없이 replaceState 사용)
+    try {
+      if (arr.length > 0) {
+        const newHash = `cand=${arr.join(',')}`;
+        history.replaceState(null, '', `#${newHash}`);
+      } else {
+        if (window.location.hash.includes('cand=')) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+      }
+    } catch(e) {
+      // 무시
+    }
+  }
+
+  // 후보군 저장 및 UI 동기화
+  function saveCandidates() {
+    syncStorageOnly();
     updateCandidateUI();
   }
 
@@ -647,8 +831,10 @@
     const count = candidateSet.size;
     const countEl = document.getElementById('candidateCount');
     const badgeEl = document.getElementById('candidateBadge');
+    const subtitleEl = document.getElementById('candidateViewSubtitle');
     if (countEl) countEl.textContent = `${count}일`;
     if (badgeEl) badgeEl.textContent = count;
+    if (subtitleEl) subtitleEl.textContent = `${count}일 선택됨`;
 
     // 캘린더 셀 상태 동기화
     document.querySelectorAll('.day-cell[data-date]').forEach(cell => {
@@ -679,9 +865,160 @@
       }
     });
 
+    // 후보군 전용 뷰 렌더링 갱신
+    renderCandidateSection();
+
     // 만약 'candidate' 필터 중이면 재필터링
     if (currentFilter === 'candidate') {
       applyFilter();
+    }
+  }
+
+  // 나의 예약 후보군 전용 섹션 렌더링
+  function renderCandidateSection() {
+    const mount = document.getElementById('candidateMount');
+    if (!mount) return;
+
+    if (!SEASON_DATA || !SEASON_DATA.days) return;
+
+    if (candidateSet.size === 0) {
+      mount.innerHTML = `
+        <div class="empty-cand-notice">
+          <span class="icon">📌</span>
+          <strong>현재 선택된 예약 후보일이 없습니다.</strong><br>
+          캘린더 날짜 셀을 원터치 탭하거나, TOP 15 목록의 [후보 담기] 버튼을 눌러 나만의 예약 날짜를 등록해보세요.<br>
+          <span style="font-size:12px; color:var(--accent); margin-top:6px; display:inline-block;">
+            선택된 날짜는 브라우저 새로고침, 재접속 후에도 영구히 안전하게 보존됩니다.
+          </span>
+        </div>
+      `;
+      return;
+    }
+
+    mount.innerHTML = '';
+    const sortedDates = [...candidateSet].sort();
+
+    sortedDates.forEach(dateStr => {
+      const d = SEASON_DATA.days.find(x => x.date === dateStr);
+      if (!d) return;
+
+      const card = document.createElement('div');
+      card.className = 'ranking-card is-candidate';
+      card.dataset.date = d.date;
+
+      let tideClass = 'slack';
+      if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'slack';
+      else if (d.tide_num >= 1 && d.tide_num <= 4) tideClass = 'gold';
+      else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
+      else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
+
+      card.innerHTML = `
+        <div class="rank-badge" style="font-size:15px; color:var(--candidate);">📌</div>
+        <div class="rank-body">
+          <div class="rank-title">
+            <span>${d.date} (${d.weekday})</span>
+            <span class="tide-badge ${tideClass}">${d.tide_name}</span>
+            ${d.holiday_name ? `<span class="holiday-tag">${d.holiday_name}</span>` : ''}
+            <span>${d.tier === 'S' ? '🌟 S등급' : d.tier === 'A' ? '✨ A등급' : d.tier === 'B' ? '🔹 B등급' : '⚠️ C등급'}</span>
+          </div>
+          <div class="rank-meta">
+            <span>음력 ${d.lunar} · 🎣 쭈꾸미 <b>${d.score_jjuk}점</b> · 🦑 갑오징어 <b>${d.score_gap}점</b></span><br>
+            <span>${d.advice || '-'}</span>
+          </div>
+        </div>
+        <div class="rank-action">
+          <button class="btn-fav active" onclick="toggleCandidate('${d.date}')" title="후보 해제">
+            ✕ 해제
+          </button>
+          <button class="btn-fav" onclick="openModal('${d.date}')">상세</button>
+        </div>
+      `;
+
+      mount.appendChild(card);
+    });
+  }
+
+  // 후보 목록 클립보드 텍스트 복사
+  function copyCandidatesList() {
+    if (candidateSet.size === 0) {
+      showToast('선택된 예약 후보일이 없습니다.');
+      return;
+    }
+
+    if (!SEASON_DATA || !SEASON_DATA.days) return;
+
+    const sortedDates = [...candidateSet].sort();
+    const lines = [
+      `🎣 [2027 쭈갑시즌 Hojak 나의 예약 후보 목록 (${sortedDates.length}일)]`
+    ];
+
+    sortedDates.forEach(dateStr => {
+      const d = SEASON_DATA.days.find(x => x.date === dateStr);
+      if (d) {
+        const holStr = d.holiday_name ? ` [${d.holiday_name}]` : '';
+        lines.push(`• ${d.date} (${d.weekday}) - ${d.tide_name} (음 ${d.lunar}) / ${d.tier}등급${holStr} (쭈:${d.score_jjuk}점, 갑:${d.score_gap}점)`);
+      } else {
+        lines.push(`• ${dateStr}`);
+      }
+    });
+
+    lines.push(`\n🔗 전체 보기: ${window.location.href}`);
+    const textToCopy = lines.join('\n');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showToast(`📋 ${sortedDates.length}개 후보 날짜가 클립보드에 복사되었습니다!`);
+      }).catch(() => {
+        fallbackCopyText(textToCopy);
+      });
+    } else {
+      fallbackCopyText(textToCopy);
+    }
+  }
+
+  // 클립보드 폴백 복사
+  function fallbackCopyText(text) {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      textArea.remove();
+      showToast('📋 클립보드에 복사되었습니다!');
+    } catch (err) {
+      showToast('복사에 실패했습니다. 브라우저 권한을 확인해주세요.');
+    }
+  }
+
+  // 공유 URL 복사
+  function copyShareUrl() {
+    const url = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('🔗 후보군이 포함된 공유 링크가 복사되었습니다!');
+      }).catch(() => {
+        fallbackCopyText(url);
+      });
+    } else {
+      fallbackCopyText(url);
+    }
+  }
+
+  // 전체 후보 해제
+  function clearCandidatesList() {
+    if (candidateSet.size === 0) {
+      showToast('해제할 후보일이 없습니다.');
+      return;
+    }
+    if (confirm(`선택된 ${candidateSet.size}개의 모든 예약 후보일을 해제하시겠습니까?`)) {
+      candidateSet.clear();
+      saveCandidates();
+      showToast('모든 예약 후보일이 해제되었습니다.');
     }
   }
 
@@ -695,8 +1032,10 @@
 
     if (candidateSet.has(dateStr)) {
       candidateSet.delete(dateStr);
+      showToast(`📌 ${dateStr} 후보가 해제되었습니다.`);
     } else {
       candidateSet.add(dateStr);
+      showToast(`📌 ${dateStr} 후보로 등록되었습니다.`);
     }
     saveCandidates();
   }
@@ -725,33 +1064,42 @@
     });
   }
 
-  // 필터 적용
+  // 필터 적용 (후보군 전용 뷰 통합)
   function applyFilter() {
     const calView = document.getElementById('calendarView');
     const rankView = document.getElementById('rankingView');
+    const candView = document.getElementById('candidateView');
     const monthNav = document.getElementById('monthNav');
+
+    if (currentFilter === 'candidate') {
+      calView.style.display = 'none';
+      monthNav.style.display = 'none';
+      rankView.style.display = 'none';
+      candView.style.display = 'block';
+      renderCandidateSection();
+      return;
+    }
 
     if (currentFilter === 'top15') {
       calView.style.display = 'none';
       monthNav.style.display = 'none';
       rankView.style.display = 'block';
+      candView.style.display = 'none';
       return;
     }
 
     calView.style.display = 'block';
     monthNav.style.display = 'flex';
     rankView.style.display = 'none';
+    candView.style.display = 'none';
 
     document.querySelectorAll('.day-cell[data-date]').forEach(cell => {
       const date = cell.dataset.date;
       const jjuk = parseInt(cell.dataset.jjuk, 10);
       const gap = parseInt(cell.dataset.gap, 10);
-      const isCand = candidateSet.has(date);
 
       let match = true;
-      if (currentFilter === 'candidate') {
-        match = isCand;
-      } else if (currentFilter === 'jjuk') {
+      if (currentFilter === 'jjuk') {
         match = jjuk >= 85;
       } else if (currentFilter === 'gap') {
         match = gap >= 85;
@@ -970,6 +1318,45 @@
   // 모달 배경 클릭 닫기
   document.getElementById('detailModal').addEventListener('click', (e) => {
     if (e.target.id === 'detailModal') closeModal();
+  });
+
+  // 앱 초기화 진입점 (DOM 준비 상태 방어)
+  function initApp() {
+    loadCandidates();
+    initFilterNav();
+    initMonthNav();
+    renderCalendar();
+    renderRanking();
+    renderCandidateSection();
+    updateCandidateUI();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
+
+  // BFCache (뒤로가기/앞으로가기 복원, 웹뷰 탭 전환) 대응
+  window.addEventListener('pageshow', (event) => {
+    loadCandidates();
+    updateCandidateUI();
+  });
+
+  // URL Hash 변경 감지 (공유 링크 로드 또는 브라우저 히스토리 변경)
+  window.addEventListener('hashchange', () => {
+    loadCandidates();
+    updateCandidateUI();
+  });
+
+  // 브라우저 백그라운드 전환 및 페이지 이탈 시 강제 플러시
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      syncStorageOnly();
+    }
+  });
+  window.addEventListener('beforeunload', () => {
+    syncStorageOnly();
   });
 </script>
 </body>
