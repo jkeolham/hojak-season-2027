@@ -525,6 +525,54 @@
     background: var(--accent);
     color: var(--ink);
   }
+
+  /* 클라우드 동기화 뱃지 */
+  .sync-badge {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    transition: all .16s ease;
+    user-select: none;
+  }
+  .sync-badge:hover { border-color: var(--accent); color: var(--text); }
+  .sync-badge .sync-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #8ca0b8;
+  }
+  .sync-badge.synced {
+    border-color: rgba(82, 196, 26, 0.45);
+    background: rgba(82, 196, 26, 0.12);
+    color: #52c41a;
+  }
+  .sync-badge.synced .sync-dot {
+    background: #52c41a;
+    box-shadow: 0 0 6px #52c41a;
+  }
+  .sync-badge.syncing {
+    border-color: rgba(24, 144, 255, 0.45);
+    background: rgba(24, 144, 255, 0.12);
+    color: #1890ff;
+  }
+  .sync-badge.syncing .sync-dot {
+    background: #1890ff;
+    animation: syncPulse 1s infinite alternate;
+  }
+  .sync-badge.local {
+    border-color: var(--line);
+    color: var(--text-dim);
+  }
+  @keyframes syncPulse {
+    from { opacity: 0.3; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.2); }
+  }
 </style>
 </head>
 <body>
@@ -536,6 +584,10 @@
       <span>HOJAK SEASON 2027</span>
       <span>·</span>
       <span>서해 경기만 91일 캘린더</span>
+      <span class="sync-badge local" id="cloudSyncBadge" title="N100 홈서버 실시간 동기화 상태 (클릭 시 수동 동기화)">
+        <span class="sync-dot"></span>
+        <span class="sync-text">☁️ 서버 확인 중...</span>
+      </span>
     </div>
     <h1>
       <img src="icon-192.png" alt="호작 아이콘">
@@ -678,12 +730,99 @@
   // localStorage 및 Cookie 키
   const STORAGE_KEY = 'hojak_candidates_2027';
 
+  // N100 서버 실시간 동기화 API 주소 (Tailscale HTTPS)
+  const SERVER_API_URL = 'https://jkeol-ubuntu.tail364926.ts.net:8790/api/candidates/2027';
+  let serverSyncTimer = null;
+  let isServerSyncing = false;
+
   // 상태 관리
   let candidateSet = new Set();
   let currentFilter = 'all';
   let currentMonth = '2027-09';
   let selectedModalDate = null;
   let toastTimer = null;
+
+  // 클라우드 동기화 상태 뱃지 업데이트
+  function updateSyncBadge(state, message) {
+    const badge = document.getElementById('cloudSyncBadge');
+    if (!badge) return;
+    const textEl = badge.querySelector('.sync-text');
+    badge.className = `sync-badge ${state}`;
+    if (textEl) textEl.textContent = message;
+  }
+
+  // 서버로부터 후보일 가져와 로컬과 병합 (GET)
+  async function fetchServerCandidates() {
+    updateSyncBadge('syncing', '☁️ 서버 확인 중...');
+    try {
+      const res = await fetch(SERVER_API_URL, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(3500)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.candidates)) {
+          let addedCount = 0;
+          data.candidates.forEach(d => {
+            if (!candidateSet.has(d)) {
+              candidateSet.add(d);
+              addedCount++;
+            }
+          });
+
+          // 로컬 데이터 중 서버에 없던 것도 있다면 서버로 즉시 push
+          const localOnlyCount = candidateSet.size - data.candidates.length;
+          if (localOnlyCount > 0) {
+            syncServerCandidates(100);
+          } else {
+            syncStorageOnly();
+            updateCandidateUI();
+            updateSyncBadge('synced', `☁️ N100 동기화됨 (${candidateSet.size}일)`);
+          }
+
+          if (addedCount > 0) {
+            showToast(`☁️ N100 서버에서 ${addedCount}개 후보일을 가져왔습니다.`);
+          }
+          return;
+        }
+      }
+      updateSyncBadge('local', '☁️ 로컬 모드');
+    } catch(e) {
+      // 오프라인 또는 Tailscale 미연결 시 조용한 로컬 모드 유지
+      console.log('[Sync] Server unreachable, using local storage mode:', e.message);
+      updateSyncBadge('local', '☁️ 로컬 모드');
+    }
+  }
+
+  // 서버로 후보일 비동기 전송 (POST - 디바운스 300ms)
+  function syncServerCandidates(delay = 300) {
+    if (serverSyncTimer) clearTimeout(serverSyncTimer);
+    updateSyncBadge('syncing', '☁️ 동기화 중...');
+
+    serverSyncTimer = setTimeout(async () => {
+      const arr = [...candidateSet].sort();
+      try {
+        const res = await fetch(SERVER_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ candidates: arr }),
+          signal: AbortSignal.timeout(4000)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            updateSyncBadge('synced', `☁️ N100 동기화됨 (${arr.length}일)`);
+            return;
+          }
+        }
+        updateSyncBadge('local', '☁️ 로컬 모드');
+      } catch(e) {
+        console.log('[Sync] POST failed, local storage preserved:', e.message);
+        updateSyncBadge('local', '☁️ 로컬 모드');
+      }
+    }, delay);
+  }
 
   // 토스트 메시지 헬퍼
   function showToast(message) {
@@ -824,6 +963,7 @@
   function saveCandidates() {
     syncStorageOnly();
     updateCandidateUI();
+    syncServerCandidates(300); // N100 서버 실시간 비동기 백업
   }
 
   // 후보군 카운트 및 UI 동기화
@@ -1329,6 +1469,18 @@
     renderRanking();
     renderCandidateSection();
     updateCandidateUI();
+
+    // N100 홈서버 클라우드 동기화 (비동기 병합)
+    fetchServerCandidates();
+
+    // 동기화 뱃지 클릭 시 수동 재동기화
+    const badgeEl = document.getElementById('cloudSyncBadge');
+    if (badgeEl) {
+      badgeEl.addEventListener('click', () => {
+        showToast('☁️ N100 서버와 실시간 동기화를 시작합니다...');
+        fetchServerCandidates();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
