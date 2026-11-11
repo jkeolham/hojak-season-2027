@@ -3593,6 +3593,9 @@
         const parsed = JSON.parse(cached);
         if (parsed && typeof parsed === 'object') {
           bookedTripsData = Object.assign({}, (SEASON_DATA && SEASON_DATA.booked_trips) || {}, parsed);
+          try {
+            localStorage.setItem(CONFIRMED_CACHE_KEY, JSON.stringify(bookedTripsData));
+          } catch(e) {}
           updateBookedUI();
         }
       } else if (SEASON_DATA && SEASON_DATA.booked_trips) {
@@ -4807,7 +4810,7 @@
 
     loadCandidates();
     initFilterNav();
-    updateBookedUI(); // 동기적으로 통계 타일 즉시 갱신 (6일 즉시 표출)
+    updateBookedUI(); // 동기적으로 통계 타일 즉시 갱신 (확정 예약 일수 즉시 표출)
     switchSeason(currentSeason);
     renderCandidateSection();
     updateCandidateUI();
