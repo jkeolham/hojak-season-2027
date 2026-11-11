@@ -13,6 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_JSON_WEST = BASE_DIR / "data" / "season_2027_recommend.json"
 DATA_JSON_JEJU = BASE_DIR / "data" / "season_2027_jeju_recommend.json"
 DATA_JSON_OPEN = BASE_DIR / "data" / "open_schedules.json"
+DATA_JSON_BOOKING = BASE_DIR / "data" / "default_booking_schedules.json"
 TEMPLATE_HTML = BASE_DIR / "template.html"
 INDEX_HTML = BASE_DIR / "index.html"
 MANIFEST_JSON = BASE_DIR / "manifest.json"
@@ -61,11 +62,20 @@ def build_html():
         except Exception as e:
             print(f"[build 경고] open_schedules.json 읽기 실패: {e}")
 
+    booking_data = {"boats": [], "schedules": {}, "updated_at": None}
+    if DATA_JSON_BOOKING.exists():
+        try:
+            with open(DATA_JSON_BOOKING, "r", encoding="utf-8") as f:
+                booking_data = json.load(f)
+        except Exception as e:
+            print(f"[build 경고] default_booking_schedules.json 읽기 실패: {e}")
+
     # 통합 데이터 패키징
     combined_data = {
         "west": data_west,
         "jeju": data_jeju,
-        "open_schedules": open_schedules
+        "open_schedules": open_schedules,
+        "booking_data": booking_data
     }
         
     with open(TEMPLATE_HTML, "r", encoding="utf-8") as f:

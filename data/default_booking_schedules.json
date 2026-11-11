@@ -1,0 +1,347 @@
+{
+  "ok": true,
+  "count": 29,
+  "scheduled_count": 3,
+  "updated_at": "2026-11-11T17:10:56.938856+09:00",
+  "schedules": {
+    "3070": {
+      "name": "타이탄호(궁평항)",
+      "open_datetime": "2027-03-01 12:00",
+      "source": "공식공지",
+      "updated": "2026-11-11"
+    },
+    "4393": {
+      "name": "블랙호(궁평항)",
+      "open_datetime": "2027-03-01 12:00",
+      "source": "공식공지",
+      "updated": "2026-11-11"
+    },
+    "6149": {
+      "name": "팀누리호(영흥도)",
+      "open_datetime": "2027-01-10 09:00",
+      "source": "사용자수기",
+      "updated": "2026-11-11 07:16:04"
+    }
+  },
+  "boats": [
+    {
+      "key": "6149",
+      "platform": "thefishing",
+      "name": "팀누리호(영흥도)",
+      "site": "http://xn--od1b68lz1wi4c.kr",
+      "has_seat": true,
+      "open_datetime": "2027-01-10 09:00",
+      "source": "사용자수기",
+      "updated": "2026-11-11 07:16:04",
+      "status": "OPEN_SCHEDULED"
+    },
+    {
+      "key": "3070",
+      "platform": "thefishing",
+      "name": "타이탄호(궁평항)",
+      "site": "http://kungpyeong.com",
+      "has_seat": true,
+      "open_datetime": "2027-03-01 12:00",
+      "source": "공식공지",
+      "updated": "2026-11-11",
+      "status": "OPEN_SCHEDULED"
+    },
+    {
+      "key": "4393",
+      "platform": "thefishing",
+      "name": "블랙호(궁평항)",
+      "site": "http://kungpyeong.com",
+      "has_seat": true,
+      "open_datetime": "2027-03-01 12:00",
+      "source": "공식공지",
+      "updated": "2026-11-11",
+      "status": "OPEN_SCHEDULED"
+    },
+    {
+      "key": "1925",
+      "platform": "thefishing",
+      "name": "스타피싱호(전곡항)",
+      "site": "http://rainbowho.com",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "1839",
+      "platform": "thefishing",
+      "name": "금강7호(영흥도)",
+      "site": "http://kumkangho.co.kr",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "176",
+      "platform": "thefishing",
+      "name": "나이스호(영흥도)",
+      "site": "http://niceho.com",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "1685",
+      "platform": "thefishing",
+      "name": "명성호(영흥도)",
+      "site": "http://xn--hq1b31ko5fzpfdsxrtb.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "1289",
+      "platform": "thefishing",
+      "name": "레전드호(영흥도)",
+      "site": "http://xn--hy1b43d01tuzn.com",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "801",
+      "platform": "thefishing",
+      "name": "영진호(영흥도)",
+      "site": "http://youngjinho.net",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "2441",
+      "platform": "thefishing",
+      "name": "루어피싱호(영흥도)",
+      "site": "http://yhdfish.net",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "2829",
+      "platform": "thefishing",
+      "name": "팀만수호(영흥도)",
+      "site": "https://teammansu.kr",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "4208",
+      "platform": "thefishing",
+      "name": "창인호(신창항)",
+      "site": "http://www.samsungfishing.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_charisma",
+      "platform": "sunsang24",
+      "name": "카리스마호(영흥도)",
+      "site": "https://charisma.sunsang24.com",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_jebi",
+      "platform": "sunsang24",
+      "name": "제비호(전곡항)",
+      "site": "https://jebi.sunsang24.com",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_king",
+      "platform": "sunsang24",
+      "name": "왕선장호(전곡항)",
+      "site": "https://king.sunsang24.com",
+      "has_seat": true,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_bless",
+      "platform": "sunsang24",
+      "name": "블레스호(신창항)",
+      "site": "https://bless.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_class",
+      "platform": "sunsang24",
+      "name": "클라쓰호(신창항)",
+      "site": "https://class.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_daizy",
+      "platform": "sunsang24",
+      "name": "데이지호(한림항)",
+      "site": "https://daizy.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_jejuseastar",
+      "platform": "sunsang24",
+      "name": "씨스타호(신창항)",
+      "site": "https://jejuseastar.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_oneshot",
+      "platform": "sunsang24",
+      "name": "한방호(신창항)",
+      "site": "https://oneshot.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_jejuace",
+      "platform": "sunsang24",
+      "name": "에이스호(도두항)",
+      "site": "https://jejuace.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_ns",
+      "platform": "sunsang24",
+      "name": "엔에스호(신창항)",
+      "site": "https://ns.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_grida",
+      "platform": "sunsang24",
+      "name": "그리다호(신창항)",
+      "site": "https://grida.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_seobu",
+      "platform": "sunsang24",
+      "name": "서부호(한림항)",
+      "site": "https://seobu.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_plus",
+      "platform": "sunsang24",
+      "name": "플러스호(한림항)",
+      "site": "https://plus.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_jejuseven",
+      "platform": "sunsang24",
+      "name": "쎄븐호(애월항)",
+      "site": "https://jejuseven.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_dreamho",
+      "platform": "sunsang24",
+      "name": "배프로호(제주항)",
+      "site": "https://dreamho.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_jjm",
+      "platform": "sunsang24",
+      "name": "그렉스호(모슬포항)",
+      "site": "https://jjm.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    },
+    {
+      "key": "sunsang24_heesung",
+      "platform": "sunsang24",
+      "name": "희성호(모슬포항)",
+      "site": "https://heesung.sunsang24.com",
+      "has_seat": false,
+      "open_datetime": null,
+      "source": null,
+      "updated": null,
+      "status": "WATCHING"
+    }
+  ]
+}

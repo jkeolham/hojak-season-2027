@@ -2099,11 +2099,17 @@
 <script>
   // 빌더에 의해 주입될 2027 데이터
   const SEASON_DATA = /* [[DATA_JSON]] */ null;
+  window.ALL_DATA = SEASON_DATA;
 
   // localStorage 및 Cookie 키
   const STORAGE_KEY = 'hojak_candidates_2027';
   const BOOKING_CACHE_KEY = 'hojak_booking_schedules_cache';
   const SEASON_STORAGE_KEY = 'hojak_season_pref_2027';
+
+  // 📡 선사 예약 오픈런 데이터 (기본값: 빌드 번들링 데이터 -> 로컬 캐시 -> API 실시간 페치)
+  let bookingData = (SEASON_DATA && SEASON_DATA.booking_data && Array.isArray(SEASON_DATA.booking_data.boats) && SEASON_DATA.booking_data.boats.length > 0)
+    ? SEASON_DATA.booking_data
+    : { boats: [], schedules: {}, updated_at: null };
 
   // 시즌 상태 관리 ('jeju': 2027 상반기 제주 심해갑 1~5월, 'west': 2027 가을 서해 쭈갑 9~11월)
   let currentSeason = 'jeju';
@@ -4288,13 +4294,18 @@
     try {
       const cached = localStorage.getItem(BOOKING_CACHE_KEY);
       if (cached) {
-        bookingData = JSON.parse(cached);
-        renderOpenrunView();
-        updateOpenrunBanner();
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.boats) && parsed.boats.length > 0) {
+          bookingData = parsed;
+        }
       }
     } catch(e) {
       console.warn('[BookingCache] load error:', e);
     }
+
+    // 기본 번들링/캐시 데이터로 즉시 화면 렌더링
+    renderOpenrunView();
+    updateOpenrunBanner();
 
     try {
       const res = await fetch(BOOKING_API_URL, {
@@ -4306,7 +4317,9 @@
         const data = await res.json();
         if (data.ok && Array.isArray(data.boats)) {
           bookingData = data;
-          localStorage.setItem(BOOKING_CACHE_KEY, JSON.stringify(data));
+          try {
+            localStorage.setItem(BOOKING_CACHE_KEY, JSON.stringify(data));
+          } catch(e) {}
           renderOpenrunView();
           updateOpenrunBanner();
           startCountdownTimers();
@@ -4315,9 +4328,9 @@
         }
       }
     } catch(e) {
-      console.log('[BookingSync] Server unreachable, using cached data:', e.message);
+      console.log('[BookingSync] Server unreachable, using bundled/cached data:', e.message);
       if (forceToast) {
-        showToast('⚠️ 서버에 연결할 수 없어 캐시된 일정을 표시합니다.');
+        showToast('⚠️ 서버에 연결할 수 없어 로컬 보존 일정을 표시합니다.');
       }
     }
   }
@@ -4350,7 +4363,7 @@
     const watchingBadge = document.getElementById('watchingCountBadge');
     const subtitle = document.getElementById('openrunSubtitle');
 
-    if (!mountScheduled || !mountWatching) return;
+    if (!mountWatching) return;
 
     const boats = bookingData.boats || [];
     const scheduled = boats.filter(b => b.status === 'OPEN_SCHEDULED');
@@ -4362,57 +4375,59 @@
       subtitle.textContent = `${scheduled.length}개 선사 오픈일정 확정 · ${watching.length}개 선사 실시간 감시 중`;
     }
 
-    // (1) 오픈 확정 선사 렌더링
-    if (scheduled.length === 0) {
-      mountScheduled.innerHTML = '<div style="grid-column:1/-1; padding:24px; text-align:center; color:var(--text-dim); background:var(--surface); border-radius:10px; border:1px solid var(--line);">현재 확정된 선사 오픈 일정이 없습니다. 우측 상단의 [➕ 오픈일정 직접 등록] 버튼을 눌러 등록하세요.</div>';
-    } else {
-      let schHtml = '';
-      scheduled.forEach(b => {
-        const platformName = b.platform === 'thefishing' ? '더피싱' : (b.platform === 'sunsang24' ? '선상24' : '자체/수기');
-        const sourceLabel = b.source || '공식공지';
-        const isManual = sourceLabel.includes('수기') || sourceLabel.includes('밴드') || sourceLabel.includes('카페');
-        const sourceClass = isManual ? 'tag-source manual' : 'tag-source';
-        const siteUrl = b.site || (b.platform === 'thefishing' ? 'https://thefishing.kr' : 'https://www.sunsang24.com');
+    // (1) 오픈 확정 선사 렌더링 (구버전 DOM 호환 지원)
+    if (mountScheduled) {
+      if (scheduled.length === 0) {
+        mountScheduled.innerHTML = '<div style="grid-column:1/-1; padding:24px; text-align:center; color:var(--text-dim); background:var(--surface); border-radius:10px; border:1px solid var(--line);">현재 확정된 선사 오픈 일정이 없습니다. 우측 상단의 [➕ 오픈일정 직접 등록] 버튼을 눌러 등록하세요.</div>';
+      } else {
+        let schHtml = '';
+        scheduled.forEach(b => {
+          const platformName = b.platform === 'thefishing' ? '더피싱' : (b.platform === 'sunsang24' ? '선상24' : '자체/수기');
+          const sourceLabel = b.source || '공식공지';
+          const isManual = sourceLabel.includes('수기') || sourceLabel.includes('밴드') || sourceLabel.includes('카페');
+          const sourceClass = isManual ? 'tag-source manual' : 'tag-source';
+          const siteUrl = b.site || (b.platform === 'thefishing' ? 'https://thefishing.kr' : 'https://www.sunsang24.com');
 
-        schHtml += `
-          <div class="boat-card scheduled">
-            <div class="boat-card-header">
-              <div>
-                <div class="boat-card-name">${escapeHtml(b.name)}</div>
-                <div style="font-size:11.5px; color:var(--text-dim); margin-top:3px;">
-                  ${b.has_seat ? '💺 좌석지정 가능' : '👥 선착순/추첨 좌석'}
+          schHtml += `
+            <div class="boat-card scheduled">
+              <div class="boat-card-header">
+                <div>
+                  <div class="boat-card-name">${escapeHtml(b.name)}</div>
+                  <div style="font-size:11.5px; color:var(--text-dim); margin-top:3px;">
+                    ${b.has_seat ? '💺 좌석지정 가능' : '👥 선착순/추첨 좌석'}
+                  </div>
+                </div>
+                <div class="boat-card-tags">
+                  <span class="tag-platform">${platformName}</span>
+                  <span class="${sourceClass}">${escapeHtml(sourceLabel)}</span>
                 </div>
               </div>
-              <div class="boat-card-tags">
-                <span class="tag-platform">${platformName}</span>
-                <span class="${sourceClass}">${escapeHtml(sourceLabel)}</span>
+
+              <div class="countdown-box">
+                <div class="countdown-label">예약 오픈까지 남은 시간</div>
+                <div class="countdown-val num" data-target="${escapeHtml(b.open_datetime)}">계산 중...</div>
+              </div>
+
+              <div class="boat-card-meta">
+                <div class="meta-row">
+                  <span>오픈 일시</span>
+                  <span class="meta-val">${escapeHtml(b.open_datetime)}</span>
+                </div>
+                <div class="meta-row">
+                  <span>최종 확인</span>
+                  <span>${escapeHtml(b.updated ? b.updated.slice(0, 10) : '-')}</span>
+                </div>
+              </div>
+
+              <div class="boat-card-actions">
+                <a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener" class="btn-boat-link">🔗 선사 사이트</a>
+                <button class="btn-boat-edit" type="button" onclick="openScheduleModal('${escapeHtml(b.name)}', '${escapeHtml(b.open_datetime)}', '${escapeHtml(sourceLabel)}')">수정</button>
               </div>
             </div>
-
-            <div class="countdown-box">
-              <div class="countdown-label">예약 오픈까지 남은 시간</div>
-              <div class="countdown-val num" data-target="${escapeHtml(b.open_datetime)}">계산 중...</div>
-            </div>
-
-            <div class="boat-card-meta">
-              <div class="meta-row">
-                <span>오픈 일시</span>
-                <span class="meta-val">${escapeHtml(b.open_datetime)}</span>
-              </div>
-              <div class="meta-row">
-                <span>최종 확인</span>
-                <span>${escapeHtml(b.updated ? b.updated.slice(0, 10) : '-')}</span>
-              </div>
-            </div>
-
-            <div class="boat-card-actions">
-              <a href="${escapeHtml(siteUrl)}" target="_blank" rel="noopener" class="btn-boat-link">🔗 선사 사이트</a>
-              <button class="btn-boat-edit" type="button" onclick="openScheduleModal('${escapeHtml(b.name)}', '${escapeHtml(b.open_datetime)}', '${escapeHtml(sourceLabel)}')">수정</button>
-            </div>
-          </div>
-        `;
-      });
-      mountScheduled.innerHTML = schHtml;
+          `;
+        });
+        mountScheduled.innerHTML = schHtml;
+      }
     }
 
     // (2) 공지 감시 중 선사 렌더링
