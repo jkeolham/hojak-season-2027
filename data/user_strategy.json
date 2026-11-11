@@ -6,19 +6,7 @@
         "date": "2027-09-02",
         "species": "jjuk",
         "seat_memo": "8번 좌현최선수",
-        "notes": "초황금물때 개막전"
-      },
-      {
-        "date": "2027-09-17",
-        "species": "both",
-        "seat_memo": "1번 우현최선수",
-        "notes": "추석 전 피딩"
-      },
-      {
-        "date": "2027-10-02",
-        "species": "gap",
-        "seat_memo": "15번 좌현선미",
-        "notes": "대물 갑오징어"
+        "notes": "개막전"
       }
     ]
   },
@@ -26,10 +14,57 @@
     "status": "planned",
     "targets": [
       {
-        "date": "2027-09-03",
+        "date": "2027-09-01",
         "species": "jjuk",
-        "seat_memo": "7번 우현중앙",
-        "notes": "궁평항 왕쭈꾸미"
+        "seat_memo": "1번 최선수",
+        "notes": "개막일"
+      }
+    ],
+    "assigned_dates": [
+      {
+        "date": "2027-09-01",
+        "memo": "개막일"
+      },
+      {
+        "date": "2027-09-04",
+        "memo": "주말"
+      },
+      {
+        "date": "2027-09-11",
+        "memo": "물돌이"
+      },
+      {
+        "date": "2027-09-12",
+        "memo": "주말"
+      },
+      {
+        "date": "2027-09-18",
+        "memo": "피딩"
+      }
+    ]
+  },
+  "star": {
+    "status": "planned",
+    "targets": [
+      {
+        "date": "2027-09-24",
+        "species": "both",
+        "seat_memo": "좌현 11번",
+        "notes": "도리도권"
+      }
+    ],
+    "assigned_dates": [
+      {
+        "date": "2027-09-24",
+        "memo": "도리도권"
+      },
+      {
+        "date": "2027-09-25",
+        "memo": "주말피크"
+      },
+      {
+        "date": "2027-09-26",
+        "memo": "마무리"
       }
     ]
   }

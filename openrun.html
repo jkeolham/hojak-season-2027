@@ -4,6 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>🎯 2027 쭈갑 선사 예약 오픈런 작전판 — Hojak</title>
+<script>
+  (function() {
+    try {
+      var expected = '7c478778c8135d67e1c70b378af90fe9633525bfb22d0d50ca3f12a87d8f63d7';
+      var token = localStorage.getItem('hojak_auth_token_2027');
+      var expiry = localStorage.getItem('hojak_auth_expiry_2027');
+      if (!token) {
+        var m = document.cookie.match(/(?:^|; )hojak_auth_token_2027=([^;]*)/);
+        if (m) token = decodeURIComponent(m[1]);
+        var me = document.cookie.match(/(?:^|; )hojak_auth_expiry_2027=([^;]*)/);
+        if (me) expiry = decodeURIComponent(me[1]);
+      }
+      if (token === expected && expiry && Date.now() < parseInt(expiry, 10)) {
+        document.documentElement.classList.add('app-already-unlocked');
+        try {
+          localStorage.setItem('hojak_auth_token_2027', token);
+          localStorage.setItem('hojak_auth_expiry_2027', expiry);
+        } catch(e){}
+        var expSec = Math.floor((parseInt(expiry, 10) - Date.now()) / 1000);
+        if (expSec > 0) {
+          document.cookie = 'hojak_auth_token_2027=' + token + '; max-age=' + expSec + '; path=/; SameSite=Lax';
+          document.cookie = 'hojak_auth_expiry_2027=' + expiry + '; max-age=' + expSec + '; path=/; SameSite=Lax';
+        }
+      }
+    } catch(e) {}
+  })();
+</script>
 <meta name="description" content="2027 서해 쭈갑 오픈런 4대 주력선사(팀누리·타이탄·블랙·스타피싱호) D-Day 카운트다운, 다중 출조일 배정 및 26척 실시간 공지 관제">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f1620">
@@ -28,6 +55,10 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* 0ms 플리커링 차단: 인증 완료 상태 즉시 노출 */
+  html.app-already-unlocked #pinGateOverlay { display: none !important; }
+  html.app-already-unlocked #appBodyWrap { display: block !important; }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -35,64 +66,13 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
-    padding-bottom: 95px;
+    padding-bottom: 30px;
   }
   .num { font-family: var(--font-mono); }
   .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 16px;
-  }
-
-  /* 📱 공통 하단 고정 탭 메뉴 (Bottom Tab Bar) */
-  .bottom-nav-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    background: rgba(15, 22, 32, 0.94);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -8px 28px rgba(0,0,0,0.55);
-    padding-bottom: env(safe-area-inset-bottom, 8px);
-  }
-  .bottom-nav-inner {
-    max-width: 600px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    height: 60px;
-  }
-  .bottom-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 11.5px;
-    font-weight: 600;
-    transition: all .16s ease;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .bottom-nav-item .nav-icon {
-    font-size: 20px;
-    line-height: 1;
-    transition: transform .16s ease;
-  }
-  .bottom-nav-item:hover {
-    color: var(--text);
-  }
-  .bottom-nav-item.active {
-    color: var(--accent);
-    font-weight: 700;
-  }
-  .bottom-nav-item.active .nav-icon {
-    transform: scale(1.1);
   }
 
   /* 헤더 */
@@ -1082,20 +1062,6 @@
       </div>
     </div>
   </main>
-
-  <!-- 📱 공통 하단 고정 탭 메뉴 (Bottom Tab Bar) -->
-  <nav class="bottom-nav-bar" id="bottomNavBar">
-    <div class="bottom-nav-inner">
-      <a href="index.html" class="bottom-nav-item" title="2027 시즌 출조 캘린더">
-        <span class="nav-icon">📅</span>
-        <span>시즌 캘린더</span>
-      </a>
-      <a href="openrun.html" class="bottom-nav-item active" title="2027 오픈런 선사 예약 작전판">
-        <span class="nav-icon">🎯</span>
-        <span>오픈런 작전판</span>
-      </a>
-    </div>
-  </nav>
 </div>
 
 <!-- 하단 토스트 알림 배너 -->
@@ -1200,15 +1166,55 @@
     }
   }
 
+  function saveAuthTokens(hash, expiry) {
+    try {
+      localStorage.setItem(AUTH_TOKEN_KEY, hash);
+      localStorage.setItem(AUTH_EXPIRY_KEY, expiry.toString());
+    } catch(e) {}
+    try {
+      const maxAge = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+      document.cookie = `${AUTH_TOKEN_KEY}=${hash}; max-age=${maxAge}; path=/; SameSite=Lax`;
+      document.cookie = `${AUTH_EXPIRY_KEY}=${expiry}; max-age=${maxAge}; path=/; SameSite=Lax`;
+    } catch(e) {}
+    document.documentElement.classList.add('app-already-unlocked');
+  }
+
+  function clearAuthTokens() {
+    try {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_EXPIRY_KEY);
+    } catch(e) {}
+    try {
+      document.cookie = `${AUTH_TOKEN_KEY}=; max-age=0; path=/; SameSite=Lax`;
+      document.cookie = `${AUTH_EXPIRY_KEY}=; max-age=0; path=/; SameSite=Lax`;
+    } catch(e) {}
+    document.documentElement.classList.remove('app-already-unlocked');
+  }
+
+  function getStoredAuth() {
+    let token = null;
+    let expiry = null;
+    try {
+      token = localStorage.getItem(AUTH_TOKEN_KEY);
+      expiry = localStorage.getItem(AUTH_EXPIRY_KEY);
+    } catch(e) {}
+    if (!token) {
+      try {
+        const m = document.cookie.match(new RegExp('(?:^|; )' + AUTH_TOKEN_KEY + '=([^;]*)'));
+        if (m) token = decodeURIComponent(m[1]);
+        const me = document.cookie.match(new RegExp('(?:^|; )' + AUTH_EXPIRY_KEY + '=([^;]*)'));
+        if (me) expiry = decodeURIComponent(me[1]);
+      } catch(e) {}
+    }
+    return { token, expiry };
+  }
+
   async function verifyPin() {
     const hash = await sha256Hex(currentPinInput);
     if (hash === PIN_HASH_EXPECTED) {
       isAppUnlocked = true;
       const expiry = Date.now() + (30 * 24 * 60 * 60 * 1000);
-      try {
-        localStorage.setItem(AUTH_TOKEN_KEY, hash);
-        localStorage.setItem(AUTH_EXPIRY_KEY, expiry.toString());
-      } catch(e) {}
+      saveAuthTokens(hash, expiry);
       unlockAppUI();
     } else {
       showToast('❌ PIN 번호가 일치하지 않습니다.');
@@ -1217,20 +1223,20 @@
   }
 
   function checkExistingAuth() {
-    try {
-      const token = localStorage.getItem(AUTH_TOKEN_KEY);
-      const expiry = localStorage.getItem(AUTH_EXPIRY_KEY);
-      if (token === PIN_HASH_EXPECTED && expiry && Date.now() < parseInt(expiry, 10)) {
-        isAppUnlocked = true;
-        unlockAppUI();
-        return true;
-      }
-    } catch(e) {}
+    const auth = getStoredAuth();
+    if (auth.token === PIN_HASH_EXPECTED && auth.expiry && Date.now() < parseInt(auth.expiry, 10)) {
+      isAppUnlocked = true;
+      saveAuthTokens(auth.token, parseInt(auth.expiry, 10)); // 양방향 동기화 및 갱신
+      unlockAppUI();
+      return true;
+    }
+    document.documentElement.classList.remove('app-already-unlocked');
     lockAppUI();
     return false;
   }
 
   function unlockAppUI() {
+    document.documentElement.classList.add('app-already-unlocked');
     const gate = document.getElementById('pinGateOverlay');
     const wrap = document.getElementById('appBodyWrap');
     if (gate) gate.style.display = 'none';
@@ -1246,10 +1252,7 @@
   }
 
   function lockApp() {
-    try {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_EXPIRY_KEY);
-    } catch(e) {}
+    clearAuthTokens();
     isAppUnlocked = false;
     lockAppUI();
     showToast('🔒 작전판이 안전하게 잠겼습니다.');
