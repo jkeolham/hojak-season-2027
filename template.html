@@ -71,11 +71,14 @@
   /* 통계 요약 타일 */
   .stat-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
-    margin: 16px 0 24px;
+    margin: 16px 0 16px;
   }
-  @media (max-width: 680px) {
+  @media (max-width: 860px) {
+    .stat-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
     .stat-grid { grid-template-columns: repeat(2, 1fr); }
   }
   .stat-tile {
@@ -95,6 +98,17 @@
     background: color-mix(in srgb, var(--accent) 8%, var(--surface));
   }
   .stat-tile.candidate-tile .val { color: var(--accent); }
+  .stat-tile.booked-tile {
+    border-color: rgba(16, 185, 129, 0.45);
+    background: color-mix(in srgb, #10b981 12%, var(--surface));
+    cursor: pointer;
+    transition: transform .16s ease, border-color .16s ease;
+  }
+  .stat-tile.booked-tile:hover {
+    transform: translateY(-2px);
+    border-color: #10b981;
+  }
+  .stat-tile.booked-tile .val { color: #34d399; }
 
   /* 월 이동 버튼 */
   .month-nav {
@@ -246,6 +260,14 @@
     display: inline-flex !important;
   }
 
+  /* 🎉 예약 확정 완료 상태 (N100 자율예약/수기등록 성공!) */
+  .day-cell.is-booked {
+    border: 2px solid #10b981 !important;
+    background: color-mix(in srgb, #10b981 18%, var(--surface)) !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.5) !important;
+    transform: translateY(-2px);
+  }
+
   /* 셀 상단: 날짜 + 음력 + 뱃지 */
   .cell-top { display: flex; justify-content: space-between; align-items: flex-start; }
   .day-num { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; line-height: 1; }
@@ -261,6 +283,23 @@
     padding: 1px 4px;
     border-radius: 4px;
     letter-spacing: -.02em;
+  }
+  .booked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #059669, #10b981);
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    letter-spacing: -.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 96px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .holiday-tag {
     font-size: 9.5px;
@@ -882,6 +921,170 @@
     cursor: pointer;
   }
   .btn-modal-cancel:hover { background: var(--surface-3); color: var(--text); }
+
+  /* 🎯 출조 목표 진척도 프로그레스 바 */
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .progress-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .progress-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+  .progress-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .progress-desc b { color: var(--text); }
+  .progress-track {
+    height: 10px;
+    background: var(--surface-2);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .progress-fill {
+    height: 100%;
+    transition: width 0.4s ease;
+  }
+  .progress-fill.booked-fill {
+    background: linear-gradient(90deg, #059669, #10b981, #34d399);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  }
+  .progress-fill.candidate-fill {
+    background: linear-gradient(90deg, #d97706, #f59e0b);
+    opacity: 0.85;
+  }
+
+  /* 🎉 모달 예약 완료 정보 카드 */
+  .modal-booked-box {
+    background: color-mix(in srgb, #10b981 12%, var(--surface));
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .booked-box-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .booked-box-icon { font-size: 24px; }
+  .booked-box-title { font-size: 15px; font-weight: 700; color: #34d399; }
+  .booked-box-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .booked-box-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .booked-grid-item { display: flex; flex-direction: column; gap: 2px; }
+  .booked-grid-label { font-size: 11px; color: var(--text-dim); }
+  .booked-grid-val { font-weight: 600; color: var(--text); word-break: break-all; }
+  .booked-box-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .btn-cancel-booking {
+    background: transparent;
+    color: var(--holiday);
+    border: 1px solid rgba(224, 108, 117, 0.4);
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .16s ease;
+  }
+  .btn-cancel-booking:hover {
+    background: rgba(224, 108, 117, 0.15);
+  }
+
+  /* ✏️ 수기 예약 등록 상자 */
+  .modal-manual-box {
+    margin-bottom: 16px;
+  }
+  .btn-toggle-manual {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-dim);
+    font-size: 12.5px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all .16s ease;
+  }
+  .btn-toggle-manual:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .manual-form {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .manual-input {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+  }
+  .manual-input:focus { border-color: var(--accent); }
+  .btn-submit-manual {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity .16s ease;
+  }
+  .btn-submit-manual:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -925,7 +1128,28 @@
       <div class="val num" id="candidateCount">0일</div>
       <div class="lbl">📌 내가 찜한 예약 후보군</div>
     </div>
+    <div class="stat-tile booked-tile" onclick="filterByBooked()" title="예약 확정된 출조일 모아보기">
+      <div class="val num" id="bookedCount">0일</div>
+      <div class="lbl">🎉 2027 출조 예약완료</div>
+    </div>
   </section>
+
+  <!-- 🎯 출조 목표 진척도 프로그레스 바 -->
+  <div class="progress-card" id="seasonProgressCard">
+    <div class="progress-header">
+      <div class="progress-title">
+        <span>🎯 2027 시즌 출조 예약 진척도</span>
+        <span class="progress-badge" id="progressPercentBadge">0% 달성</span>
+      </div>
+      <div class="progress-desc" id="progressDesc">
+        예약 확정 <b id="progBookedText">0일</b> / S등급 출조 목표 <b>23일</b> (후보군 <b id="progCandText">0일</b>)
+      </div>
+    </div>
+    <div class="progress-track" title="녹색: 예약 확정, 황금색: 예약 후보군">
+      <div class="progress-fill booked-fill" id="progressBarBooked" style="width: 0%"></div>
+      <div class="progress-fill candidate-fill" id="progressBarCandidate" style="width: 0%"></div>
+    </div>
+  </div>
 
   <!-- 🚀 오픈런 알림 배너 -->
   <div class="openrun-banner" id="openrunBanner" onclick="switchToOpenrunView()">
@@ -945,6 +1169,10 @@
     <button class="filter-btn" data-filter="candidate">
       <span>📌 나의 예약 후보군</span>
       <span class="badge num" id="candidateBadge">0</span>
+    </button>
+    <button class="filter-btn" data-filter="booked" id="btnFilterBooked">
+      <span>🎉 예약 확정</span>
+      <span class="badge num" id="bookedBadge">0</span>
     </button>
     <button class="filter-btn" data-filter="openrun" id="btnFilterOpenrun">
       <span>🚀 선사 오픈런</span>
@@ -1103,6 +1331,42 @@
       <div id="modalSubtitle" style="color:var(--text-dim); font-size:13px;">음력 8.11 · 2물</div>
     </div>
 
+    <!-- 🎉 예약 확정 정보 카드 (예약 완료 시 노출) -->
+    <div class="modal-booked-box" id="modalBookedBox" style="display:none;">
+      <div class="booked-box-header">
+        <span class="booked-box-icon">🎉</span>
+        <div>
+          <div class="booked-box-title" id="modalBookedTitle">타이탄호 예약 확정</div>
+          <div class="booked-box-sub" id="modalBookedSub">선상24 승인완료 · N100 자율 오픈런 성공</div>
+        </div>
+      </div>
+      <div class="booked-box-grid" id="modalBookedGrid">
+        <!-- JS로 동적 렌더링 -->
+      </div>
+      <div class="booked-box-actions">
+        <button type="button" class="btn-cancel-booking" onclick="cancelConfirmedBooking()">예약 확정 취소 (해제)</button>
+      </div>
+    </div>
+
+    <!-- ✏️ 수기 예약 등록 상자 (예약 미완료 시 노출) -->
+    <div class="modal-manual-box" id="modalManualBox" style="display:none;">
+      <button type="button" class="btn-toggle-manual" onclick="toggleManualBookingForm()">
+        <span>✏️ 이 날짜 출조 예약완료 수기 기록하기</span>
+        <span id="manualToggleIcon">▼</span>
+      </button>
+      <form class="manual-form" id="formManualBooking" style="display:none;" onsubmit="handleManualBookingSubmit(event)">
+        <div class="form-row">
+          <input type="text" class="manual-input" id="manualShipName" placeholder="선사/배이름 (예: 타이탄호)" required>
+          <input type="text" class="manual-input" id="manualSeat" placeholder="좌석번호 (예: 우현 3번)" required>
+        </div>
+        <div class="form-row">
+          <input type="text" class="manual-input" id="manualBankInfo" placeholder="입금계좌 / 선장연락처 (선택)">
+          <input type="number" class="manual-input" id="manualTotalFee" placeholder="선비 금액 (선택, 원)" step="1000">
+        </div>
+        <button type="submit" class="btn-submit-manual">🎉 예약 완료로 저장 (N100 실시간 동기화)</button>
+      </form>
+    </div>
+
     <!-- 후보군 등록 토글 버튼 -->
     <button class="candidate-toggle-btn" id="modalCandidateBtn" onclick="toggleModalCandidate()">
       <span>📌 예약 후보군에 등록하기</span>
@@ -1162,9 +1426,15 @@
   const SERVER_API_URL = IS_LOCAL_HOST ? '/api/candidates/2027' : 'https://jkeol-ubuntu.tail364926.ts.net:8790/api/candidates/2027';
   const BOOKING_API_URL = IS_LOCAL_HOST ? '/api/booking/schedules' : 'https://jkeol-ubuntu.tail364926.ts.net:8790/api/booking/schedules';
   const REGISTER_BOOKING_API_URL = IS_LOCAL_HOST ? '/api/booking/schedule' : 'https://jkeol-ubuntu.tail364926.ts.net:8790/api/booking/schedule';
+  const CONFIRMED_BOOKING_API_URL = IS_LOCAL_HOST ? '/api/booking/confirmed' : 'https://jkeol-ubuntu.tail364926.ts.net:8790/api/booking/confirmed';
+
+  const CONFIRMED_CACHE_KEY = 'hojak_confirmed_bookings_cache';
 
   let serverSyncTimer = null;
   let isServerSyncing = false;
+
+  // 예약 완료(확정) 데이터 상태 관리 { 'YYYY-MM-DD': { ship_name, seat, booking_id, ... } }
+  let bookedTripsData = {};
 
   // 오픈런 예약 모니터링 상태 관리
   let bookingState = { boats: [], schedules: {}, updated_at: null };
@@ -1440,6 +1710,9 @@
       }
     });
 
+    // 프로그레스 바 동기화
+    updateProgressBar();
+
     // 후보군 전용 뷰 렌더링 갱신
     renderCandidateSection();
 
@@ -1487,6 +1760,10 @@
       else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
       else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
 
+      const trip = bookedTripsData[d.date];
+      const boatTitle = trip ? (trip.boat_name || trip.ship_name || '선사') : '';
+      const bookedTag = trip ? `<span style="font-size:11px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.18); border:1px solid rgba(16,185,129,0.4); padding:2px 7px; border-radius:4px; margin-left:6px;">🎉 예약완료: ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
+
       card.innerHTML = `
         <div class="rank-badge" style="font-size:15px; color:var(--candidate);">📌</div>
         <div class="rank-body">
@@ -1495,6 +1772,7 @@
             <span class="tide-badge ${tideClass}">${d.tide_name}</span>
             ${d.holiday_name ? `<span class="holiday-tag">${d.holiday_name}</span>` : ''}
             <span>${d.tier === 'S' ? '🌟 S등급' : d.tier === 'A' ? '✨ A등급' : d.tier === 'B' ? '🔹 B등급' : '⚠️ C등급'}</span>
+            ${bookedTag}
           </div>
           <div class="rank-meta">
             <span>음력 ${d.lunar} · 🎣 쭈꾸미 <b>${d.score_jjuk}점</b> · 🦑 갑오징어 <b>${d.score_gap}점</b></span><br>
@@ -1599,8 +1877,8 @@
 
   // 원터치 날짜 셀 토글 (핵심 요구사항!)
   function toggleCandidate(dateStr, event) {
-    // 만약 info 아이콘을 클릭한 것이면 모달만 열기
-    if (event && event.target.closest('.info-icon')) {
+    // 만약 info 아이콘을 클릭했거나 이미 예약 완료된 날짜를 클릭한 경우 모달 상세 열기
+    if ((event && event.target.closest('.info-icon')) || bookedTripsData[dateStr]) {
       openModal(dateStr);
       return;
     }
@@ -1647,6 +1925,15 @@
     currentFilter = 'openrun';
     applyFilter();
     window.scrollTo({ top: 380, behavior: 'smooth' });
+  }
+
+  // 예약 확정 출조일 모아보기 필터
+  function filterByBooked() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btnFilterBooked');
+    if (btn) btn.classList.add('active');
+    currentFilter = 'booked';
+    applyFilter();
   }
 
   // 필터 적용 (후보군 및 오픈런 전용 뷰 통합)
@@ -1704,6 +1991,8 @@
         match = jjuk >= 85;
       } else if (currentFilter === 'gap') {
         match = gap >= 85;
+      } else if (currentFilter === 'booked') {
+        match = !!bookedTripsData[date];
       }
 
       if (match) {
@@ -1779,8 +2068,10 @@
         const isSun = d.weekday === '일';
         const isSat = d.weekday === '토';
         const isCandidate = candidateSet.has(d.date);
+        const trip = bookedTripsData[d.date];
+        const isBooked = !!trip;
 
-        cell.className = `day-cell ${d.is_weekend ? 'is-weekend' : ''} ${isSun ? 'is-sun' : ''} ${d.is_holiday ? 'is-holiday' : ''} tier-${d.tier} ${isCandidate ? 'is-candidate' : ''}`;
+        cell.className = `day-cell ${d.is_weekend ? 'is-weekend' : ''} ${isSun ? 'is-sun' : ''} ${d.is_holiday ? 'is-holiday' : ''} tier-${d.tier} ${isCandidate ? 'is-candidate' : ''} ${isBooked ? 'is-booked' : ''}`;
         cell.dataset.date = d.date;
         cell.dataset.jjuk = d.score_jjuk;
         cell.dataset.gap = d.score_gap;
@@ -1795,6 +2086,10 @@
         // 티어 아이콘
         const tierIcon = d.tier === 'S' ? '🌟' : d.tier === 'A' ? '✨' : '';
 
+        // 예약 완료 뱃지 HTML
+        const boatTitle = trip ? (trip.boat_name || trip.ship_name || '예약완료') : '';
+        const bookedBadgeHtml = trip ? `<span class="booked-badge" title="예약 완료: ${escapeHtml(boatTitle)} ${escapeHtml(trip.seat || '')}">🎉 ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
+
         cell.innerHTML = `
           <div class="cell-top">
             <div>
@@ -1802,6 +2097,7 @@
               <div class="lunar-text num">음 ${d.lunar}</div>
             </div>
             <div class="cell-badges">
+              ${bookedBadgeHtml}
               <span class="candidate-badge">📌 후보</span>
               ${d.holiday_name ? `<span class="holiday-tag">${d.holiday_name}</span>` : ''}
               ${tierIcon ? `<span class="tier-tag">${tierIcon}</span>` : ''}
@@ -1887,6 +2183,9 @@
     }
     document.getElementById('modalTideDetail').innerHTML = tideDetail;
 
+    // 예약 확정 카드 / 수기 등록 폼 렌더링
+    renderModalBookedSection(dateStr);
+
     updateModalCandidateBtn();
     modal.classList.add('open');
   }
@@ -1920,6 +2219,286 @@
   document.getElementById('detailModal').addEventListener('click', (e) => {
     if (e.target.id === 'detailModal') closeModal();
   });
+
+  // 🎯 출조 목표 진척도 프로그레스 바 갱신
+  function updateProgressBar() {
+    const bookedDates = Object.keys(bookedTripsData);
+    const bookedCount = bookedDates.length;
+    const candCount = candidateSet.size;
+
+    const TARGET_DAYS = 23; // S등급 초황금 출조일 목표치
+    const bookedPercent = Math.min(100, Math.round((bookedCount / TARGET_DAYS) * 100));
+    const candPercent = Math.min(100 - bookedPercent, Math.round((candCount / TARGET_DAYS) * 100));
+
+    const progBadge = document.getElementById('progressPercentBadge');
+    const progBookedText = document.getElementById('progBookedText');
+    const progCandText = document.getElementById('progCandText');
+    const barBooked = document.getElementById('progressBarBooked');
+    const barCand = document.getElementById('progressBarCandidate');
+
+    if (progBadge) progBadge.textContent = `${bookedPercent}% 달성`;
+    if (progBookedText) progBookedText.textContent = `${bookedCount}일`;
+    if (progCandText) progCandText.textContent = `${candCount}일`;
+    if (barBooked) barBooked.style.width = `${bookedPercent}%`;
+    if (barCand) barCand.style.width = `${candPercent}%`;
+  }
+
+  // 🎉 모달 내 예약 완료 정보 섹션 렌더링
+  function renderModalBookedSection(dateStr) {
+    const trip = bookedTripsData[dateStr];
+    const bookedBox = document.getElementById('modalBookedBox');
+    const manualBox = document.getElementById('modalManualBox');
+    const titleEl = document.getElementById('modalBookedTitle');
+    const subEl = document.getElementById('modalBookedSub');
+    const gridEl = document.getElementById('modalBookedGrid');
+
+    if (trip) {
+      if (bookedBox) bookedBox.style.display = 'block';
+      if (manualBox) manualBox.style.display = 'none';
+
+      const boatTitle = trip.boat_name || trip.ship_name || '선사';
+      if (titleEl) titleEl.textContent = `🎉 ${boatTitle} 예약 확정 (${trip.seat || '좌석 미정'})`;
+      if (subEl) subEl.textContent = trip.booking_id ? `예약번호: ${trip.booking_id} · N100 실시간 연동` : '출조 예약 완료 상태';
+
+      const feeVal = trip.price || trip.total_fee;
+      const feeStr = feeVal ? `${Number(feeVal).toLocaleString()}원` : '선비 금액 미입력';
+      const bookedAtStr = trip.booked_at ? trip.booked_at.replace('T', ' ').substring(0, 19) : '-';
+
+      if (gridEl) {
+        gridEl.innerHTML = `
+          <div class="booked-grid-item">
+            <span class="booked-grid-label">선박 / 선사명</span>
+            <span class="booked-grid-val">${escapeHtml(boatTitle)}</span>
+          </div>
+          <div class="booked-grid-item">
+            <span class="booked-grid-label">지정 좌석</span>
+            <span class="booked-grid-val" style="color:#34d399;">${escapeHtml(trip.seat || '미정')}</span>
+          </div>
+          <div class="booked-grid-item">
+            <span class="booked-grid-label">선비 결제금액</span>
+            <span class="booked-grid-val">${feeStr}</span>
+          </div>
+          <div class="booked-grid-item">
+            <span class="booked-grid-label">입금계좌 / 선장</span>
+            <span class="booked-grid-val">${escapeHtml(trip.bank_info || '-')}</span>
+          </div>
+          <div class="booked-grid-item" style="grid-column: span 2;">
+            <span class="booked-grid-label">예약 완료 기록시각</span>
+            <span class="booked-grid-val num" style="font-size:11px; color:var(--text-dim);">${bookedAtStr}</span>
+          </div>
+        `;
+      }
+    } else {
+      if (bookedBox) bookedBox.style.display = 'none';
+      if (manualBox) manualBox.style.display = 'block';
+      // 수기 폼 접기
+      const form = document.getElementById('formManualBooking');
+      const icon = document.getElementById('manualToggleIcon');
+      if (form) form.style.display = 'none';
+      if (icon) icon.textContent = '▼';
+      const shipInp = document.getElementById('manualShipName');
+      const seatInp = document.getElementById('manualSeat');
+      const bankInp = document.getElementById('manualBankInfo');
+      const feeInp = document.getElementById('manualTotalFee');
+      if (shipInp) shipInp.value = '';
+      if (seatInp) seatInp.value = '';
+      if (bankInp) bankInp.value = '';
+      if (feeInp) feeInp.value = '';
+    }
+  }
+
+  // 수기 예약 등록 폼 토글
+  function toggleManualBookingForm() {
+    const form = document.getElementById('formManualBooking');
+    const icon = document.getElementById('manualToggleIcon');
+    if (!form) return;
+    if (form.style.display === 'none' || !form.style.display) {
+      form.style.display = 'flex';
+      if (icon) icon.textContent = '▲';
+    } else {
+      form.style.display = 'none';
+      if (icon) icon.textContent = '▼';
+    }
+  }
+
+  // 수기 예약 등록 제출
+  async function handleManualBookingSubmit(e) {
+    e.preventDefault();
+    if (!selectedModalDate) return;
+
+    const shipName = document.getElementById('manualShipName').value.trim();
+    const seat = document.getElementById('manualSeat').value.trim();
+    const bankInfo = document.getElementById('manualBankInfo').value.trim();
+    const totalFee = document.getElementById('manualTotalFee').value.trim();
+
+    if (!shipName) {
+      alert('선사/배이름을 입력해주세요.');
+      return;
+    }
+
+    const payload = {
+      action: 'record',
+      date: selectedModalDate,
+      ship_name: shipName,
+      seat: seat,
+      bank_info: bankInfo,
+      total_fee: totalFee ? parseInt(totalFee, 10) : 0,
+      booking_id: `manual-${selectedModalDate.replace(/-/g, '')}`
+    };
+
+    try {
+      const res = await fetch(CONFIRMED_BOOKING_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        bookedTripsData[selectedModalDate] = {
+          ship_name: shipName,
+          seat: seat,
+          bank_info: bankInfo,
+          total_fee: totalFee ? parseInt(totalFee, 10) : 0,
+          booking_id: payload.booking_id,
+          date: selectedModalDate,
+          booked_at: new Date().toISOString()
+        };
+        try {
+          localStorage.setItem(CONFIRMED_CACHE_KEY, JSON.stringify(bookedTripsData));
+        } catch(e) {}
+        updateBookedUI();
+        renderModalBookedSection(selectedModalDate);
+        showToast(`🎉 ${selectedModalDate} ${shipName} 예약 완료로 등록되었습니다!`);
+      } else {
+        alert('저장 실패: ' + (data.error || '서버 오류'));
+      }
+    } catch(err) {
+      console.error('[ManualBooking] Error:', err);
+      alert('N100 서버 통신 실패. 네트워크 상태를 확인해주세요.');
+    }
+  }
+
+  // 예약 확정 취소(해제)
+  async function cancelConfirmedBooking() {
+    if (!selectedModalDate || !bookedTripsData[selectedModalDate]) return;
+    const trip = bookedTripsData[selectedModalDate];
+    const boatTitle = trip.boat_name || trip.ship_name || '선사';
+    if (!confirm(`[${selectedModalDate}] ${boatTitle} 예약을 확정 목록에서 취소(해제)하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(CONFIRMED_BOOKING_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', date: selectedModalDate })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        delete bookedTripsData[selectedModalDate];
+        try {
+          localStorage.setItem(CONFIRMED_CACHE_KEY, JSON.stringify(bookedTripsData));
+        } catch(e) {}
+        updateBookedUI();
+        renderModalBookedSection(selectedModalDate);
+        showToast(`[${selectedModalDate}] 예약 확정이 취소되었습니다.`);
+      } else {
+        alert('취소 실패: ' + (data.error || '서버 오류'));
+      }
+    } catch(err) {
+      console.error('[CancelBooking] Error:', err);
+      alert('N100 서버 통신 실패. 네트워크 상태를 확인해주세요.');
+    }
+  }
+
+  // 🎉 N100 확정 예약 목록 조회 (GET)
+  async function fetchConfirmedBookings(forceToast = false) {
+    // 1. 로컬 캐시 우선 복원
+    try {
+      const cached = localStorage.getItem(CONFIRMED_CACHE_KEY);
+      if (cached) {
+        bookedTripsData = JSON.parse(cached) || {};
+        updateBookedUI();
+      }
+    } catch(e) {
+      console.warn('[ConfirmedCache] load error:', e);
+    }
+
+    // 2. 서버 API 호출
+    try {
+      const res = await fetch(CONFIRMED_BOOKING_API_URL, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(3500)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && data.booked_trips) {
+          bookedTripsData = data.booked_trips;
+          try {
+            localStorage.setItem(CONFIRMED_CACHE_KEY, JSON.stringify(bookedTripsData));
+          } catch(e) {}
+          updateBookedUI();
+          if (forceToast) {
+            const count = Object.keys(bookedTripsData).length;
+            showToast(`🎉 N100 확정 예약 ${count}건 동기화 완료!`);
+          }
+        }
+      }
+    } catch(e) {
+      console.log('[ConfirmedSync] server unreachable, using local cache:', e.message);
+    }
+  }
+
+  // 🎉 확정 예약 데이터 기반 전체 UI 갱신
+  function updateBookedUI() {
+    const bookedDates = Object.keys(bookedTripsData);
+    const bookedCount = bookedDates.length;
+
+    // 1. 통계 타일 & 필터 뱃지
+    const countEl = document.getElementById('bookedCount');
+    const badgeEl = document.getElementById('bookedBadge');
+    if (countEl) countEl.textContent = `${bookedCount}일`;
+    if (badgeEl) badgeEl.textContent = bookedCount;
+
+    // 2. 프로그레스 바 갱신
+    updateProgressBar();
+
+    // 3. 캘린더 날짜 셀 반영
+    document.querySelectorAll('.day-cell[data-date]').forEach(cell => {
+      const date = cell.dataset.date;
+      const trip = bookedTripsData[date];
+      let badge = cell.querySelector('.booked-badge');
+
+      if (trip) {
+        cell.classList.add('is-booked');
+        const shipTitle = trip.boat_name || trip.ship_name || '예약확정';
+        const seatTitle = trip.seat ? ` ${trip.seat}` : '';
+        const label = `🎉 ${shipTitle}${seatTitle}`;
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'booked-badge';
+          const badgeContainer = cell.querySelector('.cell-badges');
+          if (badgeContainer) {
+            badgeContainer.prepend(badge);
+          }
+        }
+        badge.textContent = label;
+        badge.title = `[예약 확정] ${shipTitle} (${trip.seat || '좌석 미정'}) - 클릭하여 상세 보기`;
+      } else {
+        cell.classList.remove('is-booked');
+        if (badge) badge.remove();
+      }
+    });
+
+    // 4. 후보군 뷰 갱신
+    renderCandidateSection();
+
+    // 5. 만약 현재 'booked' 필터 중이면 재필터링
+    if (currentFilter === 'booked') {
+      applyFilter();
+    }
+  }
 
   /* ==========================================================================
      🚀 2027 선사 예약 오픈런 모니터링 및 수기 일정 등록 클라이언트 로직
@@ -2304,6 +2883,9 @@
     // 🚀 2027 선사 예약 오픈런 모니터링 일정 조회
     fetchBookingSchedules();
 
+    // 🎉 N100 자율예약 완료(확정) 목록 조회
+    fetchConfirmedBookings();
+
     // 동기화 뱃지 클릭 시 수동 재동기화
     const badgeEl = document.getElementById('cloudSyncBadge');
     if (badgeEl) {
@@ -2311,6 +2893,7 @@
         showToast('☁️ N100 서버와 실시간 동기화를 시작합니다...');
         fetchServerCandidates();
         fetchBookingSchedules();
+        fetchConfirmedBookings(true);
       });
     }
   }
