@@ -15,7 +15,9 @@ DATA_JSON_JEJU = BASE_DIR / "data" / "season_2027_jeju_recommend.json"
 DATA_JSON_OPEN = BASE_DIR / "data" / "open_schedules.json"
 DATA_JSON_BOOKING = BASE_DIR / "data" / "default_booking_schedules.json"
 TEMPLATE_HTML = BASE_DIR / "template.html"
+TEMPLATE_OPENRUN_HTML = BASE_DIR / "template_openrun.html"
 INDEX_HTML = BASE_DIR / "index.html"
+OPENRUN_HTML = BASE_DIR / "openrun.html"
 MANIFEST_JSON = BASE_DIR / "manifest.json"
 
 def build_manifest():
@@ -95,6 +97,17 @@ def build_html():
         f.write(compiled_html)
         
     print(f"[build] index.html 컴파일 완료: {INDEX_HTML} ({len(compiled_html)} bytes)")
+
+    # 2. openrun.html 컴파일 (2027 쭈갑 오픈런 작전판 독립 페이지)
+    if TEMPLATE_OPENRUN_HTML.exists():
+        with open(TEMPLATE_OPENRUN_HTML, "r", encoding="utf-8") as f:
+            template_openrun = f.read()
+        if target_token not in template_openrun:
+            raise ValueError(f"template_openrun.html 내 주입 토큰을 찾을 수 없습니다: {target_token}")
+        compiled_openrun = template_openrun.replace(target_token, f"{json_str};")
+        with open(OPENRUN_HTML, "w", encoding="utf-8") as f:
+            f.write(compiled_openrun)
+        print(f"[build] openrun.html 컴파일 완료: {OPENRUN_HTML} ({len(compiled_openrun)} bytes)")
 
 def main():
     build_manifest()
