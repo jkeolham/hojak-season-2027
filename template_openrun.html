@@ -1261,7 +1261,7 @@
   /* ==========================================================================
      🎯 2027 쭈갑 오픈런 선사 예약 작전판 (StrategyEngine)
      ========================================================================== */
-  let userStrategy = {};
+  let userStrategy = (SEASON_DATA && SEASON_DATA.strategy) ? JSON.parse(JSON.stringify(SEASON_DATA.strategy)) : {};
   let openShipsList = [];
   let strategySyncDebounceTimer = null;
   let countdownTimerInterval = null;
@@ -1375,9 +1375,11 @@
       const saved = localStorage.getItem(STRATEGY_STORAGE_KEY);
       if (saved) {
         userStrategy = JSON.parse(saved);
+      } else if (SEASON_DATA && SEASON_DATA.strategy) {
+        userStrategy = JSON.parse(JSON.stringify(SEASON_DATA.strategy));
       }
     } catch(e) {
-      userStrategy = {};
+      userStrategy = (SEASON_DATA && SEASON_DATA.strategy) ? JSON.parse(JSON.stringify(SEASON_DATA.strategy)) : {};
     }
 
     initDefaultAssignedDates();

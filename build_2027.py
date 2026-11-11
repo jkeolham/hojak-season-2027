@@ -14,6 +14,9 @@ DATA_JSON_WEST = BASE_DIR / "data" / "season_2027_recommend.json"
 DATA_JSON_JEJU = BASE_DIR / "data" / "season_2027_jeju_recommend.json"
 DATA_JSON_OPEN = BASE_DIR / "data" / "open_schedules.json"
 DATA_JSON_BOOKING = BASE_DIR / "data" / "default_booking_schedules.json"
+DATA_JSON_BOOKED = BASE_DIR / "data" / "booked_trips.json"
+DATA_JSON_CANDIDATES = BASE_DIR / "data" / "user_candidates.json"
+DATA_JSON_STRATEGY = BASE_DIR / "data" / "user_strategy.json"
 TEMPLATE_HTML = BASE_DIR / "template.html"
 TEMPLATE_OPENRUN_HTML = BASE_DIR / "template_openrun.html"
 INDEX_HTML = BASE_DIR / "index.html"
@@ -72,12 +75,40 @@ def build_html():
         except Exception as e:
             print(f"[build 경고] default_booking_schedules.json 읽기 실패: {e}")
 
+    booked_trips = {}
+    if DATA_JSON_BOOKED.exists():
+        try:
+            with open(DATA_JSON_BOOKED, "r", encoding="utf-8") as f:
+                booked_trips = json.load(f)
+        except Exception as e:
+            print(f"[build 경고] booked_trips.json 읽기 실패: {e}")
+
+    candidates = []
+    if DATA_JSON_CANDIDATES.exists():
+        try:
+            with open(DATA_JSON_CANDIDATES, "r", encoding="utf-8") as f:
+                c_data = json.load(f)
+                candidates = c_data.get("candidates", []) if isinstance(c_data, dict) else c_data
+        except Exception as e:
+            print(f"[build 경고] user_candidates.json 읽기 실패: {e}")
+
+    strategy = {}
+    if DATA_JSON_STRATEGY.exists():
+        try:
+            with open(DATA_JSON_STRATEGY, "r", encoding="utf-8") as f:
+                strategy = json.load(f)
+        except Exception as e:
+            print(f"[build 경고] user_strategy.json 읽기 실패: {e}")
+
     # 통합 데이터 패키징
     combined_data = {
         "west": data_west,
         "jeju": data_jeju,
         "open_schedules": open_schedules,
-        "booking_data": booking_data
+        "booking_data": booking_data,
+        "booked_trips": booked_trips,
+        "candidates": candidates,
+        "strategy": strategy
     }
         
     with open(TEMPLATE_HTML, "r", encoding="utf-8") as f:
