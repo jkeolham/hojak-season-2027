@@ -1176,6 +1176,170 @@
     cursor: pointer;
   }
 
+  /* 다중 출조일 배정 시스템 (Multi-Date Assignment Chips) */
+  .strategy-assigned-section {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .assigned-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .assigned-count-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(227, 169, 76, 0.18);
+    color: var(--accent);
+    border: 1px solid rgba(227, 169, 76, 0.4);
+  }
+  .assigned-count-pill {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 12px;
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+  }
+  .assigned-dates-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 32px;
+    align-items: center;
+  }
+  .assigned-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--text);
+    transition: all .15s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+  .assigned-chip:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .assigned-chip.status-booked {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #10b981;
+    font-weight: 600;
+  }
+  .assigned-chip .chip-tide {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .assigned-chip .chip-seat {
+    font-size: 11px;
+    background: var(--surface-3);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+  .assigned-chip .chip-memo {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .assigned-chip .btn-chip-remove {
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0 0 4px;
+    margin-left: 2px;
+    display: inline-flex;
+    align-items: center;
+    transition: color .15s;
+  }
+  .assigned-chip .btn-chip-remove:hover {
+    color: #ef4444;
+  }
+  .assigned-add-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+  }
+  .assigned-select-date {
+    flex: 1;
+    min-width: 200px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .btn-add-assigned-date {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .btn-add-assigned-date:hover {
+    background: var(--accent-dim);
+    transform: translateY(-1px);
+  }
+
+  /* 캘린더 날짜 셀 내 배정 선사 뱃지 */
+  .assigned-boat-badges-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 3px 0 1px;
+    width: 100%;
+  }
+  .assigned-boat-badge {
+    font-size: 10px;
+    line-height: 1.25;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: rgba(227, 169, 76, 0.16);
+    border: 1px solid rgba(227, 169, 76, 0.45);
+    color: var(--accent);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .assigned-boat-badge.booked {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.6);
+    color: #10b981;
+  }
+
   /* 오픈일정 등록 모달 폼 스타일 */
   .form-group {
     margin-bottom: 16px;
@@ -2933,6 +3097,20 @@
         const boatTitle = trip ? (trip.boat_name || trip.ship_name || '예약완료') : '';
         const bookedBadgeHtml = trip ? `<span class="booked-badge" title="예약 완료: ${escapeHtml(boatTitle)} ${escapeHtml(trip.seat || '')}">🎉 ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
 
+        const assignedList = typeof getAssignedShipsByDate === 'function' ? getAssignedShipsByDate(d.date) : [];
+        let assignedBadgesHtml = '';
+        if (assignedList.length > 0) {
+          assignedBadgesHtml = `
+            <div class="assigned-boat-badges-row">
+              ${assignedList.map(item => `
+                <span class="assigned-boat-badge ${item.status === 'booked' ? 'booked' : ''}" title="${escapeHtml(item.shipName)} 배정${item.seat ? ' (' + escapeHtml(item.seat) + ')' : ''}${item.memo ? ' - ' + escapeHtml(item.memo) : ''}">
+                  🎯 ${escapeHtml(item.shipName)}
+                </span>
+              `).join('')}
+            </div>
+          `;
+        }
+
         cell.innerHTML = `
           <div class="cell-top">
             <div>
@@ -2949,6 +3127,7 @@
           <div class="cell-mid">
             <span class="tide-badge ${tideClass}">${d.tide_name}</span>
           </div>
+          ${assignedBadgesHtml}
           <div class="cell-bot">
             <span class="diff-text num">${d.tide_diff ? `${d.tide_diff}cm` : ''}</span>
             <span class="info-icon" title="상세보기">ℹ️</span>
@@ -3476,8 +3655,218 @@
       good_seats: ['우현 1 (최선수)', '좌현 20 (최선수)', '우현 10 (선미)', '좌현 11 (선미)'],
       good_seats_desc: '우현 1(최선수) ➔ 좌현 20(최선수) ➔ 우현 10(선미) ➔ 좌현 11(선미)',
       tip: '화성방조제 왕쭈꾸미 포인트 명선박. 타이탄호와 동시 오픈이므로 동행자와 타겟 분담 추천!'
+    },
+    {
+      id: 'star',
+      ship_name: '스타피싱호',
+      port: '화성 전곡항',
+      platform: 'thefishing',
+      platform_name: '더피싱',
+      ship_id: '1925',
+      open_datetime: '',
+      open_date_str: '공지 대기중 (일정 확정 시 즉시 기입)',
+      booking_url: 'http://rainbowho.com',
+      capacity: 20,
+      good_seats: ['좌현 11 (최선수)', '우현 1 (최선수)', '좌현 20 (선미)', '우현 10 (선미)'],
+      good_seats_desc: '좌현 11(최선수) ➔ 우현 1(최선수) ➔ 좌현 20(선미) ➔ 우현 10(선미)',
+      tip: '레인보우배낚시 선단 주력선박. 전곡항 출발로 입파도/도리도권 신속 진입!'
     }
   ];
+
+  function initDefaultAssignedDates() {
+    let changed = false;
+    if (!userStrategy.titan) {
+      userStrategy.titan = { status: 'planned', targets: [], checklist: {} };
+    }
+    if (!Array.isArray(userStrategy.titan.assigned_dates) || userStrategy.titan.assigned_dates.length === 0) {
+      userStrategy.titan.assigned_dates = [
+        { date: '2027-09-01', memo: '개막 첫날', seat: '우현 1번', status: 'planned' },
+        { date: '2027-09-04', memo: '토요 황금물때', seat: '우현 1번', status: 'planned' },
+        { date: '2027-09-11', memo: '주말 쭈갑', seat: '우현 10번', status: 'planned' },
+        { date: '2027-09-12', memo: '일요 출조', seat: '우현 10번', status: 'planned' },
+        { date: '2027-09-18', memo: '토요 조금물때', seat: '좌현 20번', status: 'planned' }
+      ];
+      changed = true;
+    }
+
+    if (!userStrategy.star) {
+      userStrategy.star = { status: 'planned', targets: [], checklist: {} };
+    }
+    if (!Array.isArray(userStrategy.star.assigned_dates) || userStrategy.star.assigned_dates.length === 0) {
+      userStrategy.star.assigned_dates = [
+        { date: '2027-09-24', memo: '전곡항 출조', seat: '좌현 11번', status: 'planned' },
+        { date: '2027-09-25', memo: '토요 출조', seat: '좌현 11번', status: 'planned' },
+        { date: '2027-09-26', memo: '일요 출조', seat: '우현 1번', status: 'planned' }
+      ];
+      changed = true;
+    }
+
+    const defaultDates = ['2027-09-01', '2027-09-04', '2027-09-11', '2027-09-12', '2027-09-18', '2027-09-24', '2027-09-25', '2027-09-26'];
+    defaultDates.forEach(d => {
+      if (!candidateSet.has(d)) {
+        candidateSet.add(d);
+        if (!candidateDates.includes(d)) candidateDates.push(d);
+      }
+    });
+
+    if (changed) {
+      try {
+        localStorage.setItem(STRATEGY_STORAGE_KEY, JSON.stringify(userStrategy));
+      } catch(e) {}
+    }
+  }
+
+  // 날짜별 배정된 선사 리스트 조회 (캘린더 연동용)
+  function getAssignedShipsByDate(dateStr) {
+    const list = [];
+    if (!userStrategy) return list;
+
+    openShipsList.forEach(ship => {
+      const sid = ship.id || ship.ship_name;
+      const strat = userStrategy[sid];
+      if (!strat || !Array.isArray(strat.assigned_dates)) return;
+
+      const hit = strat.assigned_dates.find(item => {
+        const d = typeof item === 'string' ? item : item.date;
+        return d === dateStr;
+      });
+
+      if (hit) {
+        list.push({
+          shipId: sid,
+          shipName: ship.ship_name,
+          status: typeof hit === 'object' && hit.status ? hit.status : (strat.status || 'planned'),
+          seat: typeof hit === 'object' ? hit.seat : '',
+          memo: typeof hit === 'object' ? hit.memo : ''
+        });
+      }
+    });
+
+    return list;
+  }
+
+  // 선사에 날짜 배정 추가
+  function addAssignedDate(shipId, dateStr, memo = '', seat = '') {
+    if (!shipId || !dateStr) return;
+    if (!userStrategy[shipId]) {
+      userStrategy[shipId] = { status: 'planned', targets: [], checklist: {}, assigned_dates: [] };
+    }
+    if (!Array.isArray(userStrategy[shipId].assigned_dates)) {
+      userStrategy[shipId].assigned_dates = [];
+    }
+
+    const exists = userStrategy[shipId].assigned_dates.some(item => {
+      const d = typeof item === 'string' ? item : item.date;
+      return d === dateStr;
+    });
+
+    if (exists) {
+      showToast('⚠️ 이미 배정된 날짜입니다.');
+      return;
+    }
+
+    userStrategy[shipId].assigned_dates.push({
+      date: dateStr,
+      status: 'planned',
+      seat: seat || '',
+      memo: memo || ''
+    });
+
+    userStrategy[shipId].assigned_dates.sort((a, b) => {
+      const da = typeof a === 'string' ? a : a.date;
+      const db = typeof b === 'string' ? b : b.date;
+      return da.localeCompare(db);
+    });
+
+    if (!candidateSet.has(dateStr)) {
+      candidateSet.add(dateStr);
+      candidateDates.push(dateStr);
+      candidateDates.sort();
+      saveCandidateDatesToStorage();
+    }
+
+    saveStrategyToStorage(true);
+    renderStrategySection();
+    renderCalendar();
+    showToast(`📅 [${dateStr.slice(5)}] 출조일이 배정되었습니다.`);
+  }
+
+  // 선사에서 날짜 배정 해제
+  function removeAssignedDate(shipId, dateStr) {
+    if (!userStrategy[shipId] || !Array.isArray(userStrategy[shipId].assigned_dates)) return;
+    userStrategy[shipId].assigned_dates = userStrategy[shipId].assigned_dates.filter(item => {
+      const d = typeof item === 'string' ? item : item.date;
+      return d !== dateStr;
+    });
+
+    saveStrategyToStorage(true);
+    renderStrategySection();
+    renderCalendar();
+    showToast(`🗑️ [${dateStr.slice(5)}] 배정이 해제되었습니다.`);
+  }
+
+  // 배정 날짜 상태 토글 (계획중 <-> 예약완료)
+  function toggleAssignedStatus(shipId, dateStr) {
+    if (!userStrategy[shipId] || !Array.isArray(userStrategy[shipId].assigned_dates)) return;
+    const target = userStrategy[shipId].assigned_dates.find(item => {
+      const d = typeof item === 'string' ? item : item.date;
+      return d === dateStr;
+    });
+
+    if (target) {
+      if (typeof target === 'string') {
+        const idx = userStrategy[shipId].assigned_dates.indexOf(target);
+        userStrategy[shipId].assigned_dates[idx] = {
+          date: target,
+          status: 'booked',
+          seat: '',
+          memo: ''
+        };
+      } else {
+        target.status = target.status === 'booked' ? 'planned' : 'booked';
+      }
+      saveStrategyToStorage(true);
+      renderStrategySection();
+      renderCalendar();
+    }
+  }
+
+  // 배정 셀렉트 박스 옵션 생성기
+  function buildAssignedSelectOptions(alreadyAssignedDates = []) {
+    const westDays = (window.ALL_DATA && window.ALL_DATA.west && window.ALL_DATA.west.days) || [];
+    let html = '';
+
+    ['2027-09', '2027-10', '2027-11'].forEach(ym => {
+      const monthDays = westDays.filter(d => d.date.startsWith(ym));
+      const monthTitle = ym === '2027-09' ? '🗓️ 9월 (시즌 개막·추석연휴)' : (ym === '2027-10' ? '🗓️ 10월 (피크·한글날연휴)' : '🗓️ 11월 (신발짝 대물)');
+      html += `<optgroup label="${monthTitle}">`;
+      monthDays.forEach(d => {
+        const isAssigned = alreadyAssignedDates.includes(d.date);
+        const star = d.tier === 'S' ? '🌟 ' : (d.tier === 'A' ? '✨ ' : '');
+        const disLabel = isAssigned ? ' [배정됨]' : '';
+        const label = `${star}${d.date} (${d.weekday}, ${d.tide_name}${d.holiday_name ? ' · ' + d.holiday_name : ''})${disLabel}`;
+        html += `<option value="${d.date}" ${isAssigned ? 'disabled style="color:var(--text-dim);"' : ''}>${label}</option>`;
+      });
+      html += '</optgroup>';
+    });
+
+    return html;
+  }
+
+  function handleAddAssignedClick(shipId) {
+    const sel = document.getElementById(`assignedSelect_${shipId}`);
+    const seatInput = document.getElementById(`assignedSeat_${shipId}`);
+    const memoInput = document.getElementById(`assignedMemo_${shipId}`);
+    if (!sel || !sel.value) {
+      showToast('⚠️ 배정할 출조 날짜를 선택해주세요.');
+      return;
+    }
+    const dateVal = sel.value;
+    const seatVal = seatInput ? seatInput.value.trim() : '';
+    const memoVal = memoInput ? memoInput.value.trim() : '';
+
+    addAssignedDate(shipId, dateVal, memoVal, seatVal);
+  }
 
   function initStrategyEngine() {
     if (window.ALL_DATA && Array.isArray(window.ALL_DATA.open_schedules) && window.ALL_DATA.open_schedules.length > 0) {
@@ -3495,6 +3884,7 @@
       userStrategy = {};
     }
 
+    initDefaultAssignedDates();
     syncStrategyWithServer(false);
   }
 
@@ -3512,7 +3902,9 @@
             localStorage.setItem(STRATEGY_STORAGE_KEY, JSON.stringify(userStrategy));
           } catch(e) {}
         }
+        initDefaultAssignedDates();
         renderStrategySection();
+        renderCalendar();
         if (showToastMsg) showToast('☁️ N100 홈서버 및 위키 작전표 동기화 완료!');
       }
     } catch(e) {
@@ -3562,6 +3954,7 @@
       const targets = strat.targets || [];
       const checklist = strat.checklist || {};
       const statusCode = strat.status || 'planned';
+      const assignedList = Array.isArray(strat.assigned_dates) ? strat.assigned_dates : [];
 
       const openDt = ship.open_datetime || '';
       const openDtStr = ship.open_date_str || openDt.replace('T', ' ').slice(0, 16);
@@ -3579,6 +3972,7 @@
                 <span>⚓ ${escapeHtml(ship.ship_name)}</span>
                 <span class="port-tag">📍 ${escapeHtml(ship.port || '서해')}</span>
                 <span class="tag-platform">${escapeHtml(platformName)} ${shipIdBadge}</span>
+                <span class="assigned-count-pill" id="assignedPill_${sid}">총 ${assignedList.length}일 배정</span>
               </div>
               <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">
                 정원: <b>${ship.capacity || 20}석</b> · 좌석 배정: <b>${ship.platform === 'thefishing' ? '사전 좌석지정' : '현장추첨/배정'}</b>
@@ -3626,6 +4020,62 @@
                   ${idx + 1}순위: ${escapeHtml(seat)}
                 </span>
               `).join('')}
+            </div>
+          </div>
+
+          <div class="strategy-assigned-section">
+            <div class="assigned-section-header">
+              <div class="strategy-section-label" style="margin-bottom:0;">
+                📅 <b>배정된 출조 희망일</b>
+                <span class="assigned-count-badge" id="assignedBadge_${sid}">총 ${assignedList.length}일</span>
+              </div>
+              <div style="font-size:11.5px; color:var(--text-dim);">
+                💡 날짜 클릭 시 상태(계획중 ↔ 예약완료) 토글 · ✕ 클릭 시 배정 해제
+              </div>
+            </div>
+
+            <div class="assigned-dates-wrap" id="assignedWrap_${sid}">
+              ${assignedList.length === 0 ? `
+                <div style="font-size:12px; color:var(--text-dim); padding:6px 0;">
+                  배정된 출조일이 없습니다. 아래에서 희망일을 추가하세요.
+                </div>
+              ` : assignedList.map(item => {
+                const dStr = typeof item === 'string' ? item : item.date;
+                const dInfo = dayMap[dStr] || {};
+                const status = typeof item === 'object' && item.status ? item.status : 'planned';
+                const seat = typeof item === 'object' ? item.seat : '';
+                const memo = typeof item === 'object' ? item.memo : '';
+                const isBooked = status === 'booked';
+                const tideLabel = dInfo.tide_name ? `${dInfo.weekday || ''}/${dInfo.tide_name}` : '';
+                const tierBadge = dInfo.tier === 'S' ? '🌟S' : (dInfo.tier === 'A' ? '✨A' : '');
+
+                return `
+                  <div class="assigned-chip ${isBooked ? 'status-booked' : ''}" 
+                       onclick="toggleAssignedStatus('${sid}', '${dStr}')" 
+                       title="클릭 시 상태 전환 (계획중 ↔ 예약완료)">
+                    <span>${isBooked ? '🎉' : '📅'} <b>${dStr.slice(5)}</b></span>
+                    ${tideLabel ? `<span class="chip-tide">(${tideLabel})</span>` : ''}
+                    ${tierBadge ? `<span style="color:var(--accent); font-weight:700; font-size:10.5px;">${tierBadge}</span>` : ''}
+                    ${seat ? `<span class="chip-seat">${escapeHtml(seat)}</span>` : ''}
+                    ${memo ? `<span class="chip-memo">"${escapeHtml(memo)}"</span>` : ''}
+                    <button type="button" class="btn-chip-remove" 
+                            onclick="event.stopPropagation(); removeAssignedDate('${sid}', '${dStr}')" 
+                            title="배정 해제">✕</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="assigned-add-box">
+              <select class="assigned-select-date" id="assignedSelect_${sid}">
+                <option value="">➕ 출조 희망 날짜 선택...</option>
+                ${buildAssignedSelectOptions(assignedList.map(a => typeof a === 'string' ? a : a.date))}
+              </select>
+              <input type="text" class="target-input-text" id="assignedSeat_${sid}" placeholder="희망좌석 (선택, 예: 우현 1번)" style="width:140px; padding:6px 8px;">
+              <input type="text" class="target-input-text" id="assignedMemo_${sid}" placeholder="메모 (선택, 예: 개막전)" style="width:140px; padding:6px 8px;">
+              <button type="button" class="btn-add-assigned-date" onclick="handleAddAssignedClick('${sid}')">
+                ➕ 날짜 배정
+              </button>
             </div>
           </div>
 
