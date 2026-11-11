@@ -68,6 +68,44 @@
   .masthead h1 img { width: 36px; height: 36px; border-radius: 8px; vertical-align: middle; }
   .sub { color: var(--text-dim); font-size: 14.5px; line-height: 1.5; margin: 0; }
 
+  /* 🌊 시즌 선택 바 (Season Switcher) */
+  .season-selector-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 18px 0 14px;
+  }
+  @media (max-width: 600px) {
+    .season-selector-bar { grid-template-columns: 1fr; gap: 8px; }
+  }
+  .season-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all .2s ease;
+    color: var(--text);
+  }
+  .season-btn:hover {
+    border-color: rgba(227, 169, 76, 0.45);
+    background: var(--surface-2);
+  }
+  .season-btn.active {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+    box-shadow: 0 0 16px rgba(227, 169, 76, 0.25);
+  }
+  .season-btn-icon { font-size: 26px; flex-shrink: 0; }
+  .season-btn-info { display: flex; flex-direction: column; gap: 2px; }
+  .season-btn-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .season-btn.active .season-btn-title { color: var(--accent); }
+  .season-btn-meta { font-size: 11.5px; color: var(--text-dim); }
+
   /* 통계 요약 타일 */
   .stat-grid {
     display: grid;
@@ -1085,44 +1123,229 @@
     transition: opacity .16s ease;
   }
   .btn-submit-manual:hover { opacity: 0.9; }
+
+  /* 🔒 PIN 보안 잠금 게이트 오버레이 */
+  .pin-gate-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0b0f17;
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .pin-gate-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 32px 24px;
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+  .pin-gate-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .pin-gate-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .pin-gate-sub {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+    line-height: 1.4;
+  }
+  .pin-dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .pin-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: transparent;
+    transition: all .16s ease;
+  }
+  .pin-dot.filled {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(227, 169, 76, 0.5);
+    transform: scale(1.1);
+  }
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .pin-key {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    padding: 13px 0;
+    cursor: pointer;
+    user-select: none;
+    transition: all .14s ease;
+    outline: none;
+  }
+  .pin-key:hover {
+    background: var(--surface-3);
+    border-color: rgba(227, 169, 76, 0.4);
+  }
+  .pin-key:active {
+    transform: scale(0.94);
+    background: var(--accent);
+    color: var(--ink);
+  }
+  .pin-key.empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+  }
+  .pin-key.action-key {
+    font-size: 16px;
+    color: var(--text-dim);
+  }
+  .pin-error-msg {
+    color: var(--holiday);
+    font-size: 12px;
+    min-height: 18px;
+    margin-top: 4px;
+  }
+  .shake-anim {
+    animation: pin-shake 0.35s ease-in-out;
+  }
+  @keyframes pin-shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  .btn-lock-app {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 2px 7px;
+    cursor: pointer;
+    transition: all .16s ease;
+    margin-left: 6px;
+  }
+  .btn-lock-app:hover {
+    border-color: var(--holiday);
+    color: var(--holiday);
+  }
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<!-- 🔒 PIN 번호 보안 잠금 게이트 화면 -->
+<div class="pin-gate-overlay" id="pinGateOverlay">
+  <div class="pin-gate-box" id="pinGateBox">
+    <img src="icon-192.png" alt="호작 아이콘" class="pin-gate-icon">
+    <div class="pin-gate-title">HOJAK SEASON 2027</div>
+    <div class="pin-gate-sub">출조 일정 및 예약 추천일 열람을 위해<br>보안 PIN 번호 6자리를 입력하세요.</div>
+
+    <div class="pin-dots">
+      <div class="pin-dot" id="pindot0"></div>
+      <div class="pin-dot" id="pindot1"></div>
+      <div class="pin-dot" id="pindot2"></div>
+      <div class="pin-dot" id="pindot3"></div>
+      <div class="pin-dot" id="pindot4"></div>
+      <div class="pin-dot" id="pindot5"></div>
+    </div>
+
+    <div class="pin-keypad">
+      <button type="button" class="pin-key" onclick="enterPinDigit('1')">1</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('2')">2</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('3')">3</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('4')">4</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('5')">5</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('6')">6</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('7')">7</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('8')">8</button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('9')">9</button>
+      <button type="button" class="pin-key empty"></button>
+      <button type="button" class="pin-key" onclick="enterPinDigit('0')">0</button>
+      <button type="button" class="pin-key action-key" onclick="deletePinDigit()">⌫</button>
+    </div>
+
+    <div class="pin-error-msg" id="pinErrorMsg"></div>
+  </div>
+</div>
+
+<div class="wrap" id="mainAppWrap" style="display:none;">
   <!-- 마스트헤드 -->
   <header class="masthead">
     <div class="eyebrow">
       <span>HOJAK SEASON 2027</span>
       <span>·</span>
-      <span>서해 경기만 91일 캘린더</span>
+      <span id="mastheadEyebrowText">제주 심해갑 & 서해 쭈갑 통합 캘린더</span>
       <span class="sync-badge local" id="cloudSyncBadge" title="N100 홈서버 실시간 동기화 상태 (클릭 시 수동 동기화)">
         <span class="sync-dot"></span>
         <span class="sync-text">☁️ 서버 확인 중...</span>
       </span>
+      <button type="button" class="btn-lock-app" onclick="lockApp()" title="화면 잠금">🔒 잠금</button>
     </div>
     <h1>
       <img src="icon-192.png" alt="호작 아이콘">
-      <span>2027 쭈갑시즌 예약 추천일</span>
+      <span id="mastheadTitleText">2027 선상 두족류 시즌 예약 추천일</span>
     </h1>
-    <p class="sub">
-      9월~11월 91일간의 음력·물때·조위·추석 연휴 전수 교차분석. 날짜를 탭하여 <b>나만의 예약 후보군</b>을 담아두세요.
+    <p class="sub" id="mastheadSubText">
+      음력·물때·조위·공휴일 전수 교차분석. 상단 시즌을 선택하고 날짜를 탭하여 <b>나만의 예약 후보군</b>을 담아두세요.
     </p>
   </header>
+
+  <!-- 🌊 2027 시즌 전환 선택 바 (Season Switcher) -->
+  <div class="season-selector-bar" id="seasonSelectorBar">
+    <button type="button" class="season-btn active" data-season="jeju" onclick="switchSeason('jeju')">
+      <span class="season-btn-icon">🦑</span>
+      <div class="season-btn-info">
+        <span class="season-btn-title">2027 상반기 제주 심해갑 (1~5월)</span>
+        <span class="season-btn-meta">151일간 · 4~8물 사리권 풍닻 드리프트 황금물때 (스케줄 오픈 중!)</span>
+      </div>
+    </button>
+    <button type="button" class="season-btn" data-season="west" onclick="switchSeason('west')">
+      <span class="season-btn-icon">🐙</span>
+      <div class="season-btn-info">
+        <span class="season-btn-title">2027 가을 서해 쭈갑 (9~11월)</span>
+        <span class="season-btn-meta">91일간 · 경기만 조금~4물 약한물때 & 추석 황금연휴</span>
+      </div>
+    </button>
+  </div>
 
   <!-- 통계 요약 타일 -->
   <section class="stat-grid">
     <div class="stat-tile">
-      <div class="val num">91일</div>
-      <div class="lbl">시즌 총 일정 (9/1~11/30)</div>
+      <div class="val num" id="statTotalVal">151일</div>
+      <div class="lbl" id="statTotalLbl">시즌 총 일정 (1/1~5/31)</div>
     </div>
     <div class="stat-tile">
-      <div class="val num">31일</div>
-      <div class="lbl">주말 및 법정 공휴일</div>
+      <div class="val num" id="statOffdaysVal">50일</div>
+      <div class="lbl" id="statOffdaysLbl">주말 및 법정 공휴일</div>
     </div>
     <div class="stat-tile gold">
-      <div class="val num">23일</div>
-      <div class="lbl">S등급 초황금 출조일</div>
+      <div class="val num" id="statSTierVal">57일</div>
+      <div class="lbl" id="statSTierLbl">S등급 초황금 출조일</div>
     </div>
     <div class="stat-tile candidate-tile">
       <div class="val num" id="candidateCount">0일</div>
@@ -1178,9 +1401,9 @@
       <span>🚀 선사 오픈런</span>
       <span class="badge num" id="openrunBadge">3</span>
     </button>
-    <button class="filter-btn" data-filter="jjuk">🎣 쭈꾸미 황금일 (약한물)</button>
-    <button class="filter-btn" data-filter="gap">🦑 갑오징어 황금일 (스윗스팟)</button>
-    <button class="filter-btn" data-filter="top15">🏆 주말·연휴 TOP 15</button>
+    <button class="filter-btn" data-filter="jjuk" id="btnFilterJjuk">🎣 쭈꾸미 황금일 (약한물)</button>
+    <button class="filter-btn" data-filter="gap" id="btnFilterGap">🦑 갑오징어 황금일 (스윗스팟)</button>
+    <button class="filter-btn" data-filter="top15" id="btnFilterTop15">🏆 주말·연휴 TOP 15</button>
   </nav>
 
   <!-- 월 네비게이션 (캘린더 뷰일 때) -->
@@ -1374,12 +1597,12 @@
 
     <div class="modal-scores">
       <div class="score-chip">
-        <div class="v" id="modalJjukScore">100</div>
-        <div class="l">쭈꾸미 적합도</div>
+        <div class="v" id="modalScore1Val">100</div>
+        <div class="l" id="modalScore1Lbl">쭈꾸미 적합도</div>
       </div>
       <div class="score-chip">
-        <div class="v" id="modalGapScore">95</div>
-        <div class="l">갑오징어 적합도</div>
+        <div class="v" id="modalScore2Val">95</div>
+        <div class="l" id="modalScore2Lbl">갑오징어 적합도</div>
       </div>
       <div class="score-chip">
         <div class="v" id="modalTier">S</div>
@@ -1393,17 +1616,14 @@
     </div>
 
     <div class="modal-section">
-      <h4>🌊 물때 및 조위 정보 (영흥도 기준)</h4>
+      <h4 id="modalTideHeader">🌊 물때 및 조위 정보</h4>
       <p id="modalTideDetail">-</p>
     </div>
 
     <div class="modal-section">
-      <h4>⚓ 선사 바로가기 (원클릭 예약 연결)</h4>
-      <div class="boat-links-grid">
-        <a class="boat-link-btn" href="https://jkeolham.github.io/hojak-boats/" target="_blank" rel="noopener">선사정보 통합 바로가기</a>
-        <a class="boat-link-btn" href="https://www.sunsang24.com" target="_blank" rel="noopener">선상24 전체 선박</a>
-        <a class="boat-link-btn" href="https://kungpyeong.com" target="_blank" rel="noopener">궁평항 피싱클럽</a>
-        <a class="boat-link-btn" href="https://thefishing.kr" target="_blank" rel="noopener">더피싱 예약센터</a>
+      <h4 id="modalBoatHeader">⚓ 선사 바로가기 (원클릭 예약 연결)</h4>
+      <div class="boat-links-grid" id="modalBoatLinks">
+        <!-- JS로 동적 주입 -->
       </div>
     </div>
   </div>
@@ -1416,6 +1636,166 @@
   // localStorage 및 Cookie 키
   const STORAGE_KEY = 'hojak_candidates_2027';
   const BOOKING_CACHE_KEY = 'hojak_booking_schedules_cache';
+  const SEASON_STORAGE_KEY = 'hojak_season_pref_2027';
+
+  // 시즌 상태 관리 ('jeju': 2027 상반기 제주 심해갑 1~5월, 'west': 2027 가을 서해 쭈갑 9~11월)
+  let currentSeason = 'jeju';
+
+  /* ==========================================================================
+     🔒 6자리 PIN 보안 잠금 (SHA-256 해시 대조 & 30일 보존)
+     ========================================================================== */
+  const AUTH_TOKEN_KEY = 'hojak_auth_token_2027';
+  const AUTH_EXPIRY_KEY = 'hojak_auth_expiry_2027';
+  const PIN_HASH_EXPECTED = '7c478778c8135d67e1c70b378af90fe9633525bfb22d0d50ca3f12a87d8f63d7'; // pin: 790702
+
+  let currentPinInput = '';
+  let isAppUnlocked = false;
+
+  async function sha256Hex(str) {
+    const enc = new TextEncoder();
+    const data = enc.encode(str);
+    const hashBuf = await crypto.subtle.digest('SHA-256', data);
+    const hashArr = Array.from(new Uint8Array(hashBuf));
+    return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function enterPinDigit(digit) {
+    if (currentPinInput.length >= 6) return;
+    currentPinInput += digit;
+    updatePinDots();
+    if (currentPinInput.length === 6) {
+      verifyPin();
+    }
+  }
+
+  function deletePinDigit() {
+    if (currentPinInput.length === 0) return;
+    currentPinInput = currentPinInput.slice(0, -1);
+    updatePinDots();
+    clearPinError();
+  }
+
+  function clearPinInput() {
+    currentPinInput = '';
+    updatePinDots();
+  }
+
+  function updatePinDots() {
+    for (let i = 0; i < 6; i++) {
+      const dot = document.getElementById(`pindot${i}`);
+      if (dot) {
+        if (i < currentPinInput.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      }
+    }
+  }
+
+  function clearPinError() {
+    const errEl = document.getElementById('pinErrorMsg');
+    if (errEl) errEl.textContent = '';
+  }
+
+  async function verifyPin() {
+    const hash = await sha256Hex(currentPinInput);
+    if (hash === PIN_HASH_EXPECTED) {
+      const expiry = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30일간 유지
+      try {
+        localStorage.setItem(AUTH_TOKEN_KEY, hash);
+        localStorage.setItem(AUTH_EXPIRY_KEY, expiry.toString());
+      } catch(e) {}
+      unlockApp();
+    } else {
+      const box = document.getElementById('pinGateBox');
+      const errEl = document.getElementById('pinErrorMsg');
+      if (errEl) errEl.textContent = 'PIN 번호가 일치하지 않습니다.';
+      if (box) {
+        box.classList.remove('shake-anim');
+        void box.offsetWidth;
+        box.classList.add('shake-anim');
+      }
+      setTimeout(() => {
+        clearPinInput();
+      }, 400);
+    }
+  }
+
+  function unlockApp() {
+    isAppUnlocked = true;
+    const gate = document.getElementById('pinGateOverlay');
+    const wrap = document.getElementById('mainAppWrap');
+    if (gate) gate.style.display = 'none';
+    if (wrap) wrap.style.display = 'block';
+    
+    // 앱 초기화 시작
+    initApp();
+  }
+
+  function lockApp() {
+    isAppUnlocked = false;
+    try {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_EXPIRY_KEY);
+    } catch(e) {}
+    clearPinInput();
+    clearPinError();
+    const gate = document.getElementById('pinGateOverlay');
+    const wrap = document.getElementById('mainAppWrap');
+    if (gate) gate.style.display = 'flex';
+    if (wrap) wrap.style.display = 'none';
+  }
+
+  function checkAuthOnLoad() {
+    try {
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      const expiry = localStorage.getItem(AUTH_EXPIRY_KEY);
+      if (token === PIN_HASH_EXPECTED && expiry && Date.now() < parseInt(expiry, 10)) {
+        unlockApp();
+        return;
+      }
+    } catch(e) {}
+
+    // 인증 필요
+    const gate = document.getElementById('pinGateOverlay');
+    const wrap = document.getElementById('mainAppWrap');
+    if (gate) gate.style.display = 'flex';
+    if (wrap) wrap.style.display = 'none';
+
+    window.addEventListener('keydown', handlePhysicalKeyInput);
+  }
+
+  function handlePhysicalKeyInput(e) {
+    if (isAppUnlocked) return;
+    if (e.key >= '0' && e.key <= '9') {
+      enterPinDigit(e.key);
+    } else if (e.key === 'Backspace') {
+      deletePinDigit();
+    } else if (e.key === 'Escape') {
+      clearPinInput();
+    }
+  }
+
+  // 현재 활성 시즌 데이터 객체 반환 헬퍼 (하위 호환성 보장)
+  function getSeasonData() {
+    if (!SEASON_DATA) return { days: [], top_15: [] };
+    if (SEASON_DATA.jeju && SEASON_DATA.west) {
+      return SEASON_DATA[currentSeason] || SEASON_DATA.jeju;
+    }
+    return SEASON_DATA;
+  }
+
+  // 전체 시즌(제주+서해) 통합 날짜 검색 헬퍼
+  function findDayAcrossSeasons(dateStr) {
+    if (!SEASON_DATA) return null;
+    if (SEASON_DATA.jeju && SEASON_DATA.west) {
+      let found = SEASON_DATA.jeju.days ? SEASON_DATA.jeju.days.find(x => x.date === dateStr) : null;
+      if (found) return found;
+      return SEASON_DATA.west.days ? SEASON_DATA.west.days.find(x => x.date === dateStr) : null;
+    }
+    return SEASON_DATA.days ? SEASON_DATA.days.find(x => x.date === dateStr) : null;
+  }
 
   // N100 서버 실시간 동기화 API 주소 (Tailscale HTTPS 및 로컬 상대경로 자동감지)
   const IS_LOCAL_HOST = window.location.hostname === '127.0.0.1' || 
@@ -1727,7 +2107,7 @@
     const mount = document.getElementById('candidateMount');
     if (!mount) return;
 
-    if (!SEASON_DATA || !SEASON_DATA.days) return;
+    if (!SEASON_DATA) return;
 
     if (candidateSet.size === 0) {
       mount.innerHTML = `
@@ -1747,27 +2127,43 @@
     const sortedDates = [...candidateSet].sort();
 
     sortedDates.forEach(dateStr => {
-      const d = SEASON_DATA.days.find(x => x.date === dateStr);
+      const d = findDayAcrossSeasons(dateStr);
       if (!d) return;
+
+      const isJejuDay = dateStr.startsWith('2027-01') || dateStr.startsWith('2027-02') || 
+                        dateStr.startsWith('2027-03') || dateStr.startsWith('2027-04') || 
+                        dateStr.startsWith('2027-05');
 
       const card = document.createElement('div');
       card.className = 'ranking-card is-candidate';
       card.dataset.date = d.date;
 
       let tideClass = 'slack';
-      if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'slack';
-      else if (d.tide_num >= 1 && d.tide_num <= 4) tideClass = 'gold';
-      else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
-      else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
+      if (isJejuDay) {
+        if (d.tide_num >= 4 && d.tide_num <= 8) tideClass = 'gold';
+        else if (d.tide_num >= 9 && d.tide_num <= 10) tideClass = 'speed';
+        else if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'surge';
+      } else {
+        if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'slack';
+        else if (d.tide_num >= 1 && d.tide_num <= 4) tideClass = 'gold';
+        else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
+        else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
+      }
 
       const trip = bookedTripsData[d.date];
       const boatTitle = trip ? (trip.boat_name || trip.ship_name || '선사') : '';
       const bookedTag = trip ? `<span style="font-size:11px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.18); border:1px solid rgba(16,185,129,0.4); padding:2px 7px; border-radius:4px; margin-left:6px;">🎉 예약완료: ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
+      const areaTag = isJejuDay ? '<span style="font-size:10.5px; color:#6ee7b7; background:rgba(16,185,129,0.15); padding:1px 5px; border-radius:4px; margin-right:4px;">제주</span>' : '<span style="font-size:10.5px; color:#93c5fd; background:rgba(59,130,246,0.15); padding:1px 5px; border-radius:4px; margin-right:4px;">서해</span>';
+
+      const scoreMeta = isJejuDay ? 
+        `음력 ${d.lunar} · 🦑 심해갑 <b>${d.score_deep_gap || 0}점</b>` :
+        `음력 ${d.lunar} · 🎣 쭈꾸미 <b>${d.score_jjuk || 0}점</b> · 🦑 갑오징어 <b>${d.score_gap || 0}점</b>`;
 
       card.innerHTML = `
         <div class="rank-badge" style="font-size:15px; color:var(--candidate);">📌</div>
         <div class="rank-body">
           <div class="rank-title">
+            ${areaTag}
             <span>${d.date} (${d.weekday})</span>
             <span class="tide-badge ${tideClass}">${d.tide_name}</span>
             ${d.holiday_name ? `<span class="holiday-tag">${d.holiday_name}</span>` : ''}
@@ -1775,7 +2171,7 @@
             ${bookedTag}
           </div>
           <div class="rank-meta">
-            <span>음력 ${d.lunar} · 🎣 쭈꾸미 <b>${d.score_jjuk}점</b> · 🦑 갑오징어 <b>${d.score_gap}점</b></span><br>
+            <span>${scoreMeta}</span><br>
             <span>${d.advice || '-'}</span>
           </div>
         </div>
@@ -1905,16 +2301,108 @@
     });
   }
 
-  // 월 네비게이션 초기화
-  function initMonthNav() {
-    document.querySelectorAll('.month-btn').forEach(btn => {
+  // 월 네비게이션 동적 렌더링 (시즌에 맞춤)
+  function renderMonthNav() {
+    const mount = document.getElementById('monthNav');
+    if (!mount) return;
+    mount.innerHTML = '';
+
+    const monthsConfig = currentSeason === 'jeju' ? [
+      { ym: '2027-01', label: '1월 (신정연휴·대포알 개막)' },
+      { ym: '2027-02', label: '2월 (설날 4연휴·영등철 피크)' },
+      { ym: '2027-03', label: '3월 (삼일절 연휴·신발짝 찬스)' },
+      { ym: '2027-04', label: '4월 (봄 수온상승·마릿수 시동)' },
+      { ym: '2027-05', label: '5월 (어린이날연휴·마릿수 대폭발)' }
+    ] : [
+      { ym: '2027-09', label: '9월 (시즌개막·추석대연휴)' },
+      { ym: '2027-10', label: '10월 (피크·개천절/한글날)' },
+      { ym: '2027-11', label: '11월 (신발짝 대물 찬스)' }
+    ];
+
+    monthsConfig.forEach((cfg, idx) => {
+      const btn = document.createElement('button');
+      btn.className = `month-btn ${cfg.ym === currentMonth ? 'active' : ''}`;
+      btn.dataset.month = cfg.ym;
+      btn.textContent = cfg.label;
       btn.addEventListener('click', () => {
         document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentMonth = btn.dataset.month;
+        currentMonth = cfg.ym;
         showMonthCalendar(currentMonth);
       });
+      mount.appendChild(btn);
     });
+  }
+
+  // 🌊 시즌 전환 함수 ('jeju' vs 'west')
+  function switchSeason(season) {
+    if (season !== 'jeju' && season !== 'west') return;
+    currentSeason = season;
+    try {
+      localStorage.setItem(SEASON_STORAGE_KEY, season);
+    } catch(e) {}
+
+    // 시즌 선택 버튼 UI 갱신
+    document.querySelectorAll('.season-btn').forEach(btn => {
+      if (btn.dataset.season === season) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    const activeData = getSeasonData();
+
+    // 마스트헤드 텍스트 갱신
+    const eyebrowEl = document.getElementById('mastheadEyebrowText');
+    const titleEl = document.getElementById('mastheadTitleText');
+    const subEl = document.getElementById('mastheadSubText');
+    if (season === 'jeju') {
+      if (eyebrowEl) eyebrowEl.textContent = '제주 서부(한림·신창·차귀도) 151일 심해갑 캘린더';
+      if (titleEl) titleEl.textContent = '2027 상반기 제주 심해갑오징어 예약 추천일';
+      if (subEl) subEl.innerHTML = '1월~5월 151일간의 음력·물때·풍닻 드리프트 전수 교차분석. <b>4~8물 사리권 황금물때</b>를 탭하여 후보군에 담아두세요.';
+      document.getElementById('statTotalVal').textContent = `${activeData.total_days || 151}일`;
+      document.getElementById('statTotalLbl').textContent = '시즌 총 일정 (1/1~5/31)';
+      document.getElementById('statOffdaysVal').textContent = `${activeData.offdays_count || 50}일`;
+      document.getElementById('statOffdaysLbl').textContent = '주말 및 법정 공휴일';
+      document.getElementById('statSTierVal').textContent = `${activeData.s_tier_count || 57}일`;
+      document.getElementById('statSTierLbl').textContent = 'S등급 초황금 출조일';
+
+      // 필터 버튼 라벨
+      document.getElementById('btnFilterJjuk').textContent = '🦑 심해갑 황금일 (4~8물)';
+      document.getElementById('btnFilterGap').textContent = '🏆 대포알 영등철 (1~3월)';
+      document.getElementById('btnFilterTop15').textContent = '🏆 제주 주말·연휴 TOP 15';
+
+      currentMonth = '2027-01';
+    } else {
+      if (eyebrowEl) eyebrowEl.textContent = '서해 경기만(영흥·대부·궁평·오천) 91일 쭈갑 캘린더';
+      if (titleEl) titleEl.textContent = '2027 가을 서해 쭈갑시즌 예약 추천일';
+      if (subEl) subEl.innerHTML = '9월~11월 91일간의 음력·물때·조위·추석 연휴 전수 교차분석. 날짜를 탭하여 <b>나만의 예약 후보군</b>을 담아두세요.';
+      document.getElementById('statTotalVal').textContent = `${activeData.total_days || 91}일`;
+      document.getElementById('statTotalLbl').textContent = '시즌 총 일정 (9/1~11/30)';
+      document.getElementById('statOffdaysVal').textContent = `${activeData.offdays_count || 31}일`;
+      document.getElementById('statOffdaysLbl').textContent = '주말 및 법정 공휴일';
+      document.getElementById('statSTierVal').textContent = `${activeData.s_tier_count || 23}일`;
+      document.getElementById('statSTierLbl').textContent = 'S등급 초황금 출조일';
+
+      // 필터 버튼 라벨
+      document.getElementById('btnFilterJjuk').textContent = '🎣 쭈꾸미 황금일 (약한물)';
+      document.getElementById('btnFilterGap').textContent = '🦑 갑오징어 황금일 (스윗스팟)';
+      document.getElementById('btnFilterTop15').textContent = '🏆 주말·연휴 TOP 15';
+
+      currentMonth = '2027-09';
+    }
+
+    renderMonthNav();
+    renderCalendar();
+    renderRanking();
+    updateProgressBar();
+    applyFilter();
+  }
+
+  // 월 네비게이션 초기화 (레거시 호환용)
+  function initMonthNav() {
+    renderMonthNav();
   }
 
   // 오픈런 현황판 바로가기
@@ -1985,12 +2473,21 @@
       const date = cell.dataset.date;
       const jjuk = parseInt(cell.dataset.jjuk, 10);
       const gap = parseInt(cell.dataset.gap, 10);
+      const deepGap = parseInt(cell.dataset.deepGap, 10);
 
       let match = true;
       if (currentFilter === 'jjuk') {
-        match = jjuk >= 85;
+        if (currentSeason === 'jeju') {
+          match = deepGap >= 90;
+        } else {
+          match = jjuk >= 85;
+        }
       } else if (currentFilter === 'gap') {
-        match = gap >= 85;
+        if (currentSeason === 'jeju') {
+          match = date.startsWith('2027-01') || date.startsWith('2027-02') || date.startsWith('2027-03');
+        } else {
+          match = gap >= 85;
+        }
       } else if (currentFilter === 'booked') {
         match = !!bookedTripsData[date];
       }
@@ -2016,28 +2513,40 @@
 
   // 캘린더 렌더링
   function renderCalendar() {
-    if (!SEASON_DATA || !SEASON_DATA.days) return;
+    const activeData = getSeasonData();
+    if (!activeData || !activeData.days) return;
     const mount = document.getElementById('calendarMount');
     mount.innerHTML = '';
 
-    const months = ['2027-09', '2027-10', '2027-11'];
-    const monthNames = {
+    const months = currentSeason === 'jeju' ? 
+      ['2027-01', '2027-02', '2027-03', '2027-04', '2027-05'] : 
+      ['2027-09', '2027-10', '2027-11'];
+
+    const monthNames = currentSeason === 'jeju' ? {
+      '2027-01': '2027년 1월 (신정 3연휴 · 제주 심해갑 시즌 개막)',
+      '2027-02': '2027년 2월 (설날 4연휴 · 대포알 1kg+ 영등철 피크)',
+      '2027-03': '2027년 3월 (삼일절 3연휴 · 몬스터급 대물 찬스)',
+      '2027-04': '2027년 4월 (봄 수온 상승 · 마릿수 활성도 급증)',
+      '2027-05': '2027년 5월 (어린이날/부처님오신날 황금연휴 · 마릿수 대폭발)'
+    } : {
       '2027-09': '2027년 9월 (시즌 개막 · 추석 대황금연휴)',
       '2027-10': '2027년 10월 (가을 피크 · 개천절/한글날 3연휴)',
       '2027-11': '2027년 11월 (신발짝 몬스터 대물 찬스)'
     };
 
     months.forEach((ym, idx) => {
-      const monthDays = SEASON_DATA.days.filter(d => d.date.startsWith(ym));
+      const monthDays = activeData.days.filter(d => d.date.startsWith(ym));
+      if (monthDays.length === 0) return;
+
       const block = document.createElement('div');
       block.className = 'month-calendar-block';
       block.dataset.ym = ym;
-      if (idx !== 0) block.style.display = 'none';
+      if (ym !== currentMonth) block.style.display = 'none';
 
       // 월 타이틀
       const header = document.createElement('div');
       header.className = 'cal-month-header';
-      header.innerHTML = `<span>${monthNames[ym]}</span><span class="month-tag">${monthDays.length}일</span>`;
+      header.innerHTML = `<span>${monthNames[ym] || ym}</span><span class="month-tag">${monthDays.length}일</span>`;
       block.appendChild(header);
 
       // 그리드
@@ -2055,7 +2564,7 @@
 
       // 첫날 요일에 맞춘 빈 셀
       const firstDate = new Date(`${monthDays[0].date}T00:00:00`);
-      const firstDayIndex = firstDate.getDay(); // 0(일) ~ 6(토)
+      const firstDayIndex = firstDate.getDay();
       for (let i = 0; i < firstDayIndex; i++) {
         const empty = document.createElement('div');
         empty.className = 'day-cell empty';
@@ -2073,20 +2582,29 @@
 
         cell.className = `day-cell ${d.is_weekend ? 'is-weekend' : ''} ${isSun ? 'is-sun' : ''} ${d.is_holiday ? 'is-holiday' : ''} tier-${d.tier} ${isCandidate ? 'is-candidate' : ''} ${isBooked ? 'is-booked' : ''}`;
         cell.dataset.date = d.date;
-        cell.dataset.jjuk = d.score_jjuk;
-        cell.dataset.gap = d.score_gap;
+        cell.dataset.season = currentSeason;
+        if (currentSeason === 'jeju') {
+          cell.dataset.deepGap = d.score_deep_gap || 0;
+        } else {
+          cell.dataset.jjuk = d.score_jjuk || 0;
+          cell.dataset.gap = d.score_gap || 0;
+        }
 
-        // 물때 클래스
+        // 물때 뱃지 색상 클래스
         let tideClass = 'slack';
-        if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'slack';
-        else if (d.tide_num >= 1 && d.tide_num <= 4) tideClass = 'gold';
-        else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
-        else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
+        if (currentSeason === 'jeju') {
+          if (d.tide_num >= 4 && d.tide_num <= 8) tideClass = 'gold'; // 사리권 풍닻 드리프트 황금물때
+          else if (d.tide_num >= 9 && d.tide_num <= 10) tideClass = 'speed';
+          else if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'surge'; // 주의
+          else tideClass = 'slack';
+        } else {
+          if (d.tide_name === '조금' || d.tide_name === '무시') tideClass = 'slack';
+          else if (d.tide_num >= 1 && d.tide_num <= 4) tideClass = 'gold';
+          else if (d.tide_num >= 9 && d.tide_num <= 12) tideClass = 'speed';
+          else if (d.tide_num >= 6 && d.tide_num <= 8) tideClass = 'surge';
+        }
 
-        // 티어 아이콘
         const tierIcon = d.tier === 'S' ? '🌟' : d.tier === 'A' ? '✨' : '';
-
-        // 예약 완료 뱃지 HTML
         const boatTitle = trip ? (trip.boat_name || trip.ship_name || '예약완료') : '';
         const bookedBadgeHtml = trip ? `<span class="booked-badge" title="예약 완료: ${escapeHtml(boatTitle)} ${escapeHtml(trip.seat || '')}">🎉 ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
 
@@ -2112,9 +2630,7 @@
           </div>
         `;
 
-        // 탭 토글 클릭 리스너 연결
         cell.addEventListener('click', (e) => toggleCandidate(d.date, e));
-
         grid.appendChild(cell);
       });
 
@@ -2125,15 +2641,22 @@
 
   // TOP 15 랭킹 렌더링
   function renderRanking() {
-    if (!SEASON_DATA || !SEASON_DATA.top_15) return;
+    const activeData = getSeasonData();
+    if (!activeData || !activeData.top_15) return;
     const mount = document.getElementById('rankingMount');
     mount.innerHTML = '';
 
-    SEASON_DATA.top_15.forEach(item => {
+    const isJeju = currentSeason === 'jeju';
+
+    activeData.top_15.forEach(item => {
       const card = document.createElement('div');
       const isCand = candidateSet.has(item.date);
       card.className = `ranking-card ${isCand ? 'is-candidate' : ''}`;
       card.dataset.date = item.date;
+
+      const scoreMetaHtml = isJeju ? 
+        `<span>🦑 심해갑 적합도 <b>${item.score_deep_gap}점</b> (사리권 풍닻 드리프트 황금물때)</span>` :
+        `<span>🎣 쭈꾸미 <b>${item.score_jjuk}점</b> · 🦑 갑오징어 <b>${item.score_gap}점</b></span>`;
 
       card.innerHTML = `
         <div class="rank-badge">${item.rank}</div>
@@ -2145,7 +2668,7 @@
             <span>${item.tier === 'S' ? '🌟 S등급' : '✨ A등급'}</span>
           </div>
           <div class="rank-meta">
-            <span>🎣 쭈꾸미 <b>${item.score_jjuk}점</b> · 🦑 갑오징어 <b>${item.score_gap}점</b></span><br>
+            ${scoreMetaHtml}<br>
             <span>${item.advice}</span>
           </div>
         </div>
@@ -2161,19 +2684,83 @@
     });
   }
 
+  // 모달 선사 링크 동적 렌더링
+  function renderModalBoatLinks(season) {
+    const mount = document.getElementById('modalBoatLinks');
+    if (!mount) return;
+    
+    if (season === 'jeju') {
+      mount.innerHTML = `
+        <a class="boat-link-btn" href="https://bless.sunsang24.com" target="_blank" rel="noopener">신창 블레스호 (선상24)</a>
+        <a class="boat-link-btn" href="https://class.sunsang24.com" target="_blank" rel="noopener">신창 클라쓰호 (선상24)</a>
+        <a class="boat-link-btn" href="https://daizy.sunsang24.com" target="_blank" rel="noopener">한림 데이지호 (쌍포운용)</a>
+        <a class="boat-link-btn" href="https://jejuseastar.sunsang24.com" target="_blank" rel="noopener">신창 씨스타호 (선상24)</a>
+        <a class="boat-link-btn" href="https://oneshot.sunsang24.com" target="_blank" rel="noopener">신창 한방호 (선상24)</a>
+        <a class="boat-link-btn" href="https://thefishing.kr/ship/ship_detail.php?ship_id=4208" target="_blank" rel="noopener">신창 창인호 (더피싱)</a>
+        <a class="boat-link-btn" href="https://www.sunsang24.com/ship/list?port_area=7" target="_blank" rel="noopener">선상24 제주 전체 선박</a>
+        <a class="boat-link-btn" href="https://jkeolham.github.io/hojak-boats/" target="_blank" rel="noopener">선사정보 통합 바로가기</a>
+      `;
+    } else {
+      mount.innerHTML = `
+        <a class="boat-link-btn" href="https://jkeolham.github.io/hojak-boats/" target="_blank" rel="noopener">선사정보 통합 바로가기</a>
+        <a class="boat-link-btn" href="https://www.sunsang24.com" target="_blank" rel="noopener">선상24 전체 선박</a>
+        <a class="boat-link-btn" href="https://kungpyeong.com" target="_blank" rel="noopener">궁평항 피싱클럽</a>
+        <a class="boat-link-btn" href="https://thefishing.kr" target="_blank" rel="noopener">더피싱 예약센터</a>
+      `;
+    }
+  }
+
   // 모달 오픈
   function openModal(dateStr) {
-    if (!SEASON_DATA || !SEASON_DATA.days) return;
-    const d = SEASON_DATA.days.find(x => x.date === dateStr);
+    const isJeju = dateStr.startsWith('2027-01') || dateStr.startsWith('2027-02') || 
+                   dateStr.startsWith('2027-03') || dateStr.startsWith('2027-04') || 
+                   dateStr.startsWith('2027-05');
+    
+    // 선택된 날짜와 현재 시즌이 다르면 자동 전환
+    if (isJeju && currentSeason !== 'jeju') {
+      switchSeason('jeju');
+    } else if (!isJeju && currentSeason !== 'west') {
+      switchSeason('west');
+    }
+
+    const d = findDayAcrossSeasons(dateStr);
     if (!d) return;
 
     selectedModalDate = dateStr;
     const modal = document.getElementById('detailModal');
     document.getElementById('modalTitle').textContent = `${d.date} (${d.weekday})`;
     document.getElementById('modalSubtitle').textContent = `음력 ${d.lunar} · ${d.tide_name} ${d.holiday_name ? `· ${d.holiday_name}` : ''}`;
-    document.getElementById('modalJjukScore').textContent = d.score_jjuk;
-    document.getElementById('modalGapScore').textContent = d.score_gap;
-    document.getElementById('modalTier').textContent = d.tier;
+
+    const score1Val = document.getElementById('modalScore1Val');
+    const score1Lbl = document.getElementById('modalScore1Lbl');
+    const score2Val = document.getElementById('modalScore2Val');
+    const score2Lbl = document.getElementById('modalScore2Lbl');
+    const tierVal = document.getElementById('modalTier');
+
+    if (tierVal) tierVal.textContent = d.tier;
+
+    if (isJeju) {
+      if (score1Val) score1Val.textContent = d.score_deep_gap || 0;
+      if (score1Lbl) score1Lbl.textContent = '심해갑 적합도';
+      if (score2Val) {
+        score2Val.textContent = d.tide_num >= 4 && d.tide_num <= 8 ? '황금' : '보통';
+        score2Val.style.fontSize = '18px';
+      }
+      if (score2Lbl) score2Lbl.textContent = '풍닻 드리프트';
+      document.getElementById('modalTideHeader').textContent = '🌊 물때 및 조위 정보 (한림항 기준)';
+      renderModalBoatLinks('jeju');
+    } else {
+      if (score1Val) score1Val.textContent = d.score_jjuk || 0;
+      if (score1Lbl) score1Lbl.textContent = '쭈꾸미 적합도';
+      if (score2Val) {
+        score2Val.textContent = d.score_gap || 0;
+        score2Val.style.fontSize = '';
+      }
+      if (score2Lbl) score2Lbl.textContent = '갑오징어 적합도';
+      document.getElementById('modalTideHeader').textContent = '🌊 물때 및 조위 정보 (영흥도 기준)';
+      renderModalBoatLinks('west');
+    }
+
     document.getElementById('modalAdvice').textContent = d.advice;
 
     let tideDetail = `조위차: ${d.tide_diff}cm | 일출: ${d.sunrise || '-'} / 일몰: ${d.sunset || '-'}`;
@@ -2222,23 +2809,34 @@
 
   // 🎯 출조 목표 진척도 프로그레스 바 갱신
   function updateProgressBar() {
-    const bookedDates = Object.keys(bookedTripsData);
-    const bookedCount = bookedDates.length;
-    const candCount = candidateSet.size;
+    const activeData = getSeasonData();
+    const TARGET_DAYS = (activeData && activeData.s_tier_count) ? activeData.s_tier_count : (currentSeason === 'jeju' ? 57 : 23);
 
-    const TARGET_DAYS = 23; // S등급 초황금 출조일 목표치
+    const seasonDays = (activeData && activeData.days) ? new Set(activeData.days.map(x => x.date)) : new Set();
+    
+    let bookedCount = 0;
+    Object.keys(bookedTripsData).forEach(d => {
+      if (seasonDays.size === 0 || seasonDays.has(d)) bookedCount++;
+    });
+
+    let candCount = 0;
+    candidateSet.forEach(d => {
+      if (seasonDays.size === 0 || seasonDays.has(d)) candCount++;
+    });
+
     const bookedPercent = Math.min(100, Math.round((bookedCount / TARGET_DAYS) * 100));
     const candPercent = Math.min(100 - bookedPercent, Math.round((candCount / TARGET_DAYS) * 100));
 
     const progBadge = document.getElementById('progressPercentBadge');
-    const progBookedText = document.getElementById('progBookedText');
-    const progCandText = document.getElementById('progCandText');
+    const progDesc = document.getElementById('progressDesc');
     const barBooked = document.getElementById('progressBarBooked');
     const barCand = document.getElementById('progressBarCandidate');
 
+    const seasonLabel = currentSeason === 'jeju' ? '제주 심해갑' : '서해 쭈갑';
     if (progBadge) progBadge.textContent = `${bookedPercent}% 달성`;
-    if (progBookedText) progBookedText.textContent = `${bookedCount}일`;
-    if (progCandText) progCandText.textContent = `${candCount}일`;
+    if (progDesc) {
+      progDesc.innerHTML = `[${seasonLabel}] 예약 확정 <b id="progBookedText">${bookedCount}일</b> / S등급 출조 목표 <b>${TARGET_DAYS}일</b> (후보군 <b id="progCandText">${candCount}일</b>)`;
+    }
     if (barBooked) barBooked.style.width = `${bookedPercent}%`;
     if (barCand) barCand.style.width = `${candPercent}%`;
   }
@@ -2869,11 +3467,21 @@
 
   // 앱 초기화 진입점 (DOM 준비 상태 방어)
   function initApp() {
+    // 마지막 저장된 시즌 선호도 또는 URL 파라미터 복원
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSeason = urlParams.get('season');
+      const savedSeason = localStorage.getItem(SEASON_STORAGE_KEY);
+      if (urlSeason && (urlSeason === 'jeju' || urlSeason === 'west')) {
+        currentSeason = urlSeason;
+      } else if (savedSeason && (savedSeason === 'jeju' || savedSeason === 'west')) {
+        currentSeason = savedSeason;
+      }
+    } catch(e) {}
+
     loadCandidates();
     initFilterNav();
-    initMonthNav();
-    renderCalendar();
-    renderRanking();
+    switchSeason(currentSeason);
     renderCandidateSection();
     updateCandidateUI();
 
@@ -2898,10 +3506,11 @@
     }
   }
 
+  // 🔒 인증 우선 진입점 (PIN Gate 통과 후 initApp 실행)
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
+    document.addEventListener('DOMContentLoaded', checkAuthOnLoad);
   } else {
-    initApp();
+    checkAuthOnLoad();
   }
 
   // BFCache (뒤로가기/앞으로가기 복원, 웹뷰 탭 전환) 대응

@@ -1,6 +1,6 @@
 {
-  "name": "2027 쭈갑시즌 예약 추천일 — Hojak",
-  "short_name": "2027 쭈갑",
+  "name": "2027 쭈갑·심해갑 시즌 예약 추천일 — Hojak",
+  "short_name": "2027 쭈갑·심해갑",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1620",

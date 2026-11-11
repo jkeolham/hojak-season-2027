@@ -10,15 +10,16 @@ import json
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_JSON = BASE_DIR / "data" / "season_2027_recommend.json"
+DATA_JSON_WEST = BASE_DIR / "data" / "season_2027_recommend.json"
+DATA_JSON_JEJU = BASE_DIR / "data" / "season_2027_jeju_recommend.json"
 TEMPLATE_HTML = BASE_DIR / "template.html"
 INDEX_HTML = BASE_DIR / "index.html"
 MANIFEST_JSON = BASE_DIR / "manifest.json"
 
 def build_manifest():
     manifest = {
-        "name": "2027 쭈갑시즌 예약 추천일 — Hojak",
-        "short_name": "2027 쭈갑",
+        "name": "2027 쭈갑·심해갑 시즌 예약 추천일 — Hojak",
+        "short_name": "2027 쭈갑·심해갑",
         "start_url": "./index.html",
         "display": "standalone",
         "background_color": "#0f1620",
@@ -41,17 +42,27 @@ def build_manifest():
     print(f"[build] manifest.json 생성 완료: {MANIFEST_JSON}")
 
 def build_html():
-    if not DATA_JSON.exists():
-        raise FileNotFoundError(f"데이터 파일이 없습니다: {DATA_JSON}")
+    if not DATA_JSON_WEST.exists():
+        raise FileNotFoundError(f"서해 데이터 파일이 없습니다: {DATA_JSON_WEST}")
+    if not DATA_JSON_JEJU.exists():
+        raise FileNotFoundError(f"제주 데이터 파일이 없습니다: {DATA_JSON_JEJU}")
         
-    with open(DATA_JSON, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    with open(DATA_JSON_WEST, "r", encoding="utf-8") as f:
+        data_west = json.load(f)
+    with open(DATA_JSON_JEJU, "r", encoding="utf-8") as f:
+        data_jeju = json.load(f)
+
+    # 통합 데이터 패키징
+    combined_data = {
+        "west": data_west,
+        "jeju": data_jeju
+    }
         
     with open(TEMPLATE_HTML, "r", encoding="utf-8") as f:
         template = f.read()
         
     # JSON 직렬화 (안전한 스크립트 주입)
-    json_str = json.dumps(data, ensure_ascii=False)
+    json_str = json.dumps(combined_data, ensure_ascii=False)
     
     # 템플릿 주입
     target_token = "/* [[DATA_JSON]] */ null;"
@@ -68,7 +79,7 @@ def build_html():
 def main():
     build_manifest()
     build_html()
-    print("[build] 2027 쭈갑시즌 웹앱 빌드 완료!")
+    print("[build] 2027 쭈갑·제주심해갑 통합 웹앱 빌드 완료!")
 
 if __name__ == "__main__":
     main()
