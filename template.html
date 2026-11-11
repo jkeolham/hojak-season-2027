@@ -58,7 +58,13 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
   body {
     background: var(--ink);
     color: var(--text);
@@ -73,7 +79,13 @@
   html.app-already-unlocked #pinGateOverlay { display: none !important; }
   html.app-already-unlocked #mainAppWrap { display: block !important; }
 
-  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 36px; }
+  .wrap {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 14px 36px;
+    box-sizing: border-box;
+  }
 
   /* 헤더 마스트헤드 우측 오픈런 바로가기 버튼 */
   .btn-nav-openrun {
@@ -120,7 +132,17 @@
     align-items: center;
     gap: 10px;
   }
-  .masthead h1 img { width: 36px; height: 36px; border-radius: 8px; vertical-align: middle; }
+  .masthead h1 img {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+    border-radius: 8px;
+    vertical-align: middle;
+  }
   .sub { color: var(--text-dim); font-size: 14.5px; line-height: 1.5; margin: 0; }
 
   /* 🌊 시즌 선택 바 (Season Switcher - 2단 복원) */
@@ -129,6 +151,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin: 18px 0 14px;
+    width: 100%;
   }
   @media (max-width: 650px) {
     .season-selector-bar { grid-template-columns: 1fr; gap: 8px; }
@@ -167,12 +190,15 @@
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     margin: 16px 0 16px;
+    width: 100%;
   }
   @media (max-width: 860px) {
     .stat-grid { grid-template-columns: repeat(3, 1fr); }
+    .stat-tile:last-child { grid-column: span 2; }
   }
   @media (max-width: 560px) {
-    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-tile:last-child { grid-column: span 2; }
   }
   .stat-tile {
     background: var(--surface);
@@ -281,11 +307,12 @@
   }
   .cal-month-header .month-tag { font-size: 12px; font-weight: normal; color: var(--text-dim); }
 
-  /* 캘린더 그리드 */
+  /* 캘린더 그리드 (minmax(0, 1fr)로 가로 팽창 원천 방지) */
   .cal-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
   }
   .cal-day-header {
     text-align: center;
@@ -302,15 +329,16 @@
   .day-cell {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 10px;
-    min-height: 100px;
-    padding: 8px 7px 6px;
+    border-radius: 8px;
+    min-height: 95px;
+    padding: 6px 5px 5px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
     cursor: pointer;
     user-select: none;
+    overflow: hidden;
     transition: all .18s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .day-cell:hover {
@@ -362,36 +390,37 @@
   }
 
   /* 셀 상단: 날짜 + 음력 + 뱃지 */
-  .cell-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .day-num { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; line-height: 1; }
-  .lunar-text { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-  .cell-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .cell-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 2px; }
+  .day-num { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; line-height: 1; }
+  .lunar-text { font-size: 9.5px; color: var(--text-dim); margin-top: 2px; }
+  .cell-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; max-width: 70%; overflow: hidden; }
 
   .candidate-badge {
     display: none;
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 700;
     color: var(--ink);
     background: var(--candidate);
     padding: 1px 4px;
     border-radius: 4px;
     letter-spacing: -.02em;
+    white-space: nowrap;
   }
   .booked-badge {
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 700;
     color: #ffffff;
     background: linear-gradient(135deg, #059669, #10b981);
-    padding: 1.5px 5px;
+    padding: 1px 4px;
     border-radius: 4px;
     letter-spacing: -.02em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 96px;
+    max-width: 100%;
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
   .holiday-tag {
@@ -3134,8 +3163,10 @@
         }
 
         const tierIcon = d.tier === 'S' ? '🌟' : d.tier === 'A' ? '✨' : '';
-        const boatTitle = trip ? (trip.boat_name || trip.ship_name || '예약완료') : '';
-        const bookedBadgeHtml = trip ? `<span class="booked-badge" title="예약 완료: ${escapeHtml(boatTitle)} ${escapeHtml(trip.seat || '')}">🎉 ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
+        const rawBoat = trip ? (trip.boat_name || trip.ship_name || '예약완료') : '';
+        const shortBoat = rawBoat.replace(/\(.*?\)/g, '').trim();
+        const fullDetail = `${rawBoat}${trip && trip.seat ? ' ' + trip.seat : ''}`;
+        const bookedBadgeHtml = trip ? `<span class="booked-badge" title="예약 완료: ${escapeHtml(fullDetail)}">🎉 ${escapeHtml(shortBoat)}</span>` : '';
 
         const assignedList = typeof getAssignedShipsByDate === 'function' ? getAssignedShipsByDate(d.date) : [];
         let assignedBadgesHtml = '';
@@ -3624,8 +3655,8 @@
       if (trip) {
         cell.classList.add('is-booked');
         const shipTitle = trip.boat_name || trip.ship_name || '예약확정';
-        const seatTitle = trip.seat ? ` ${trip.seat}` : '';
-        const label = `🎉 ${shipTitle}${seatTitle}`;
+        const cleanBoatName = shipTitle.replace(/\(.*?\)/g, '').trim();
+        const label = `🎉 ${cleanBoatName}`;
         if (!badge) {
           badge = document.createElement('span');
           badge.className = 'booked-badge';
@@ -4776,6 +4807,7 @@
 
     loadCandidates();
     initFilterNav();
+    updateBookedUI(); // 동기적으로 통계 타일 즉시 갱신 (6일 즉시 표출)
     switchSeason(currentSeason);
     renderCandidateSection();
     updateCandidateUI();

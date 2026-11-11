@@ -55,6 +55,11 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
   /* 0ms 플리커링 차단: 인증 완료 상태 즉시 노출 */
   html.app-already-unlocked #pinGateOverlay { display: none !important; }
   html.app-already-unlocked #appBodyWrap { display: block !important; }
