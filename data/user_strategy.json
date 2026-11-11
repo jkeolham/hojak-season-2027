@@ -1,0 +1,36 @@
+{
+  "teamnuri": {
+    "status": "planned",
+    "targets": [
+      {
+        "date": "2027-09-02",
+        "species": "jjuk",
+        "seat_memo": "8번 좌현최선수",
+        "notes": "초황금물때 개막전"
+      },
+      {
+        "date": "2027-09-17",
+        "species": "both",
+        "seat_memo": "1번 우현최선수",
+        "notes": "추석 전 피딩"
+      },
+      {
+        "date": "2027-10-02",
+        "species": "gap",
+        "seat_memo": "15번 좌현선미",
+        "notes": "대물 갑오징어"
+      }
+    ]
+  },
+  "titan": {
+    "status": "planned",
+    "targets": [
+      {
+        "date": "2027-09-03",
+        "species": "jjuk",
+        "seat_memo": "7번 우현중앙",
+        "notes": "궁평항 왕쭈꾸미"
+      }
+    ]
+  }
+}

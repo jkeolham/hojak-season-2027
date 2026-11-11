@@ -68,14 +68,14 @@
   .masthead h1 img { width: 36px; height: 36px; border-radius: 8px; vertical-align: middle; }
   .sub { color: var(--text-dim); font-size: 14.5px; line-height: 1.5; margin: 0; }
 
-  /* 🌊 시즌 선택 바 (Season Switcher) */
+  /* 🌊 시즌 선택 바 (Season Switcher - 3단 확장) */
   .season-selector-bar {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     margin: 18px 0 14px;
   }
-  @media (max-width: 600px) {
+  @media (max-width: 900px) {
     .season-selector-bar { grid-template-columns: 1fr; gap: 8px; }
   }
   .season-btn {
@@ -901,6 +901,281 @@
   }
   .openrun-info-box b { color: var(--text); }
 
+  /* 🎯 2027 쭈갑 오픈런 작전판 (Strategy Dashboard) 고도화 스타일 */
+  .strategy-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 30px;
+  }
+  .strategy-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: all .2s ease;
+  }
+  .strategy-card:hover {
+    border-color: rgba(227,169,76,0.5);
+  }
+  .strategy-card.status-booked {
+    border-color: rgba(16,185,129,0.5);
+    background: linear-gradient(180deg, rgba(16,185,129,0.05), var(--surface));
+  }
+  .strategy-card.status-booked::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: #10b981;
+  }
+  .strategy-card.status-planned::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), #ff9800);
+  }
+  .strategy-card.status-failed::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: #ef4444;
+  }
+  .strategy-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .strategy-ship-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .strategy-ship-title .port-tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+  }
+  .strategy-status-select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .strategy-timer-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: center;
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  @media (max-width: 650px) {
+    .strategy-timer-row { grid-template-columns: 1fr; }
+  }
+  .strategy-timer-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: .02em;
+  }
+  .strategy-timer-val.urgent {
+    color: #ff4d4f;
+    animation: pulseGlow 1.5s infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.02); }
+  }
+  .btn-booking-direct {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all .16s ease;
+  }
+  .btn-booking-direct:hover {
+    background: var(--accent-dim);
+    transform: translateY(-1px);
+  }
+  .strategy-seats-section {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .strategy-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .seats-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .seat-chip {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(227, 169, 76, 0.12);
+    border: 1px solid rgba(227, 169, 76, 0.35);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .seat-chip.priority-1 {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+  .strategy-targets-section {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .targets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 820px) {
+    .targets-grid { grid-template-columns: 1fr; }
+  }
+  .target-rank-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .target-rank-card.rank-1 { border-color: rgba(227,169,76,0.4); }
+  .target-rank-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .target-rank-header .rank-badge {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .rank-badge.r1 { background: var(--accent); color: var(--ink); }
+  .rank-badge.r2 { background: var(--surface-3); color: var(--text); }
+  .rank-badge.r3 { background: var(--surface-3); color: var(--text-dim); }
+  .target-select-date {
+    width: 100%;
+    padding: 7px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .target-meta-chip {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-height: 20px;
+    align-items: center;
+  }
+  .target-meta-chip span {
+    background: var(--surface-3);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .target-input-row {
+    display: flex;
+    gap: 6px;
+  }
+  .target-species-btn {
+    padding: 4px 7px;
+    border-radius: 5px;
+    font-size: 11px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .target-species-btn.active {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+  .target-input-text {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .strategy-checklist-section {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .checklist-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+  }
+  .checklist-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
   /* 오픈일정 등록 모달 폼 스타일 */
   .form-group {
     margin-bottom: 16px;
@@ -1315,20 +1590,27 @@
     </p>
   </header>
 
-  <!-- 🌊 2027 시즌 전환 선택 바 (Season Switcher) -->
+  <!-- 🌊 2027 시즌 전환 선택 바 (Season Switcher - 3단 확장) -->
   <div class="season-selector-bar" id="seasonSelectorBar">
     <button type="button" class="season-btn active" data-season="jeju" onclick="switchSeason('jeju')">
       <span class="season-btn-icon">🦑</span>
       <div class="season-btn-info">
-        <span class="season-btn-title">2027 상반기 제주 심해갑 (1~5월)</span>
-        <span class="season-btn-meta">151일간 · 4~8물 사리권 풍닻 드리프트 황금물때 (스케줄 오픈 중!)</span>
+        <span class="season-btn-title">2027 제주 심해갑 (1~5월)</span>
+        <span class="season-btn-meta">151일간 · 4~8물 사리권 풍닻 드리프트 (오픈 중)</span>
       </div>
     </button>
     <button type="button" class="season-btn" data-season="west" onclick="switchSeason('west')">
       <span class="season-btn-icon">🐙</span>
       <div class="season-btn-info">
-        <span class="season-btn-title">2027 가을 서해 쭈갑 (9~11월)</span>
-        <span class="season-btn-meta">91일간 · 경기만 조금~4물 약한물때 & 추석 황금연휴</span>
+        <span class="season-btn-title">2027 서해 쭈갑 (9~11월)</span>
+        <span class="season-btn-meta">91일간 · 5·6물 스윗스팟 & 확정휴가 4일</span>
+      </div>
+    </button>
+    <button type="button" class="season-btn" data-season="strategy" onclick="switchSeason('strategy')">
+      <span class="season-btn-icon">🎯</span>
+      <div class="season-btn-info">
+        <span class="season-btn-title">2027 쭈갑 오픈런 작전판</span>
+        <span class="season-btn-meta">팀누리·타이탄·블랙호 D-Day & 1·2·3순위 플래너</span>
       </div>
     </button>
   </div>
@@ -1444,29 +1726,25 @@
     <div id="candidateMount"></div>
   </section>
 
-  <!-- 🚀 선사 오픈런 모니터링 및 D-Day 현황 뷰 컨테이너 -->
+  <!-- 🎯 2027 쭈갑 오픈런 선사 예약 작전판 & D-Day 현황 뷰 컨테이너 -->
   <section class="openrun-view" id="openrunView">
     <div class="cal-month-header">
       <div>
-        <span>🚀 2027 쭈갑 선사 오픈런 D-Day & 모니터링</span>
-        <span class="month-tag" id="openrunSubtitle">3개 선사 오픈일정 확정 · 11개 선사 실시간 감시 중</span>
+        <span>🎯 2027 쭈갑 오픈런 선사 예약 작전판</span>
+        <span class="month-tag" id="openrunSubtitle">팀누리·타이탄·블랙호 D-Day 카운트다운 & 1·2·3순위 플래너</span>
       </div>
       <div class="candidate-header-actions">
-        <button class="btn-action-cand" onclick="openScheduleModal()" title="새로운 오픈 일정 수기 등록" style="background:var(--accent); color:var(--ink); font-weight:700;">➕ 오픈일정 직접 등록</button>
-        <button class="btn-action-cand" onclick="fetchBookingSchedules(true)" title="서버 최신 일정 새로고침">🔄 새로고침</button>
+        <button class="btn-action-cand" onclick="openScheduleModal()" title="새로운 오픈 선사 등록" style="background:var(--accent); color:var(--ink); font-weight:700;">➕ 오픈선사 직접 등록</button>
+        <button class="btn-action-cand" onclick="syncStrategyWithServer(true)" title="N100 서버 실시간 동기화">🔄 클라우드 동기화</button>
       </div>
     </div>
 
-    <!-- 오픈 확정 선사 섹션 -->
-    <div class="openrun-section-title">
-      <span>⏰ 오픈일정 확정 선사 (D-Day 카운트다운)</span>
-      <span class="count-pill" id="scheduledCountBadge">0척</span>
-    </div>
-    <div class="openrun-grid" id="openrunMountScheduled">
-      <!-- 동적 렌더링 -->
+    <!-- 🎯 선사별 전략 대시보드 카드 그리드 -->
+    <div class="strategy-grid" id="strategyCardMount">
+      <!-- JS로 동적 렌더링 -->
     </div>
 
-    <!-- 공지 감시 중 선사 섹션 -->
+    <!-- 📡 공지 감시 중 선사 섹션 (notice_watcher 연동) -->
     <div class="openrun-section-title">
       <span>📡 오픈공지 감시 중인 선사 (notice_watcher)</span>
       <span class="count-pill" id="watchingCountBadge">0척</span>
@@ -1477,11 +1755,11 @@
 
     <!-- 자율 예약 시스템 상태 안내 박스 -->
     <div class="openrun-info-box">
-      <div>🤖 <b>N100 자율 선사 오픈런 예약 시스템 연동 안내</b></div>
-      <div style="margin-top:4px;">
-        • 본 시스템은 N100 홈서버의 <code>notice_watcher</code>가 더피싱 및 선상24 공지사항을 10분 주기로 자동 스크래핑하여 오픈 일정을 감지합니다.<br>
-        • 오픈 일정이 확정된 선사는 오픈 1분 전 자동 대기 및 오픈 시각 정각에 모의/실전 예약(오픈런) 엔진이 자율 가동됩니다.<br>
-        • 외부 경로(네이버 밴드, 카페, 지인 등)로 먼저 확인된 일정은 우측 상단의 <b>[➕ 오픈일정 직접 등록]</b> 버튼을 통해 즉시 수기 등록할 수 있습니다.
+      <div>🤖 <b>N100 2027 쭈갑 오픈런 예약 작전판 & 실시간 위키 연동 안내</b></div>
+      <div style="margin-top:6px; line-height: 1.65;">
+        • <b>실시간 D-Day</b>: 브라우저와 PC 표준 시각을 기준으로 초 단위 실시간 카운트다운을 제공하며, 오픈 24시간 전부터 골드 글로우로 하이라이트됩니다.<br>
+        • <b>타겟 출조일 플래너</b>: 캘린더의 물때(조석), 요일, 어종(쭈 vs 갑)과 실시간 연동되어 1·2·3순위 출조 계획과 희망 좌석을 전략적으로 수립할 수 있습니다.<br>
+        • <b>양방향 클라우드 동기화</b>: 수정 시 로컬 즉시 저장(0ms) 및 N100 홈서버(300ms 디바운스)를 통해 Hojak 위키(<code>sources/2027-season-reservation-candidates.md</code>) 작전표에 실시간 영구 기록됩니다.
       </div>
     </div>
   </section>
@@ -1523,6 +1801,31 @@
           <label for="modalOpenTime">오픈 시간</label>
           <input type="time" id="modalOpenTime" class="form-control" value="12:00" required>
         </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="modalPort">출항 항구</label>
+          <input type="text" id="modalPort" class="form-control" placeholder="예: 영흥도 진두항">
+        </div>
+        <div class="form-group">
+          <label for="modalPlatform">예약 플랫폼</label>
+          <select id="modalPlatform" class="form-control">
+            <option value="thefishing">더피싱</option>
+            <option value="sunsang24">선상24</option>
+            <option value="custom">자체/기타</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="modalSiteUrl">예약 사이트 URL</label>
+        <input type="url" id="modalSiteUrl" class="form-control" placeholder="http:// 또는 https://">
+      </div>
+
+      <div class="form-group">
+        <label for="modalGoodSeats">명당 좌석 가이드</label>
+        <input type="text" id="modalGoodSeats" class="form-control" placeholder="예: 좌현 8(최선수) ➔ 1(우현최선수) ➔ 15(최선미)">
       </div>
 
       <div class="form-group">
@@ -2334,9 +2637,9 @@
     });
   }
 
-  // 🌊 시즌 전환 함수 ('jeju' vs 'west')
+  // 🌊 시즌 전환 함수 ('jeju' vs 'west' vs 'strategy')
   function switchSeason(season) {
-    if (season !== 'jeju' && season !== 'west') return;
+    if (season !== 'jeju' && season !== 'west' && season !== 'strategy') return;
     currentSeason = season;
     try {
       localStorage.setItem(SEASON_STORAGE_KEY, season);
@@ -2351,12 +2654,31 @@
       }
     });
 
-    const activeData = getSeasonData();
-
-    // 마스트헤드 텍스트 갱신
     const eyebrowEl = document.getElementById('mastheadEyebrowText');
     const titleEl = document.getElementById('mastheadTitleText');
     const subEl = document.getElementById('mastheadSubText');
+
+    if (season === 'strategy') {
+      if (eyebrowEl) eyebrowEl.textContent = '영흥도·궁평항 2027 시즌 선사 오픈런 작전판';
+      if (titleEl) titleEl.textContent = '2027 쭈갑 오픈런 선사 예약 작전판';
+      if (subEl) subEl.innerHTML = '팀누리호·타이탄호·블랙호 D-Day 카운트다운 & 1·2·3순위 타겟 출조일·명당 좌석 플래너. N100 홈서버 및 Hojak 위키와 실시간 동기화됩니다.';
+
+      const shipCount = (openShipsList && openShipsList.length) || 3;
+      document.getElementById('statTotalVal').textContent = `${shipCount}척`;
+      document.getElementById('statTotalLbl').textContent = '오픈런 관리 선사';
+      document.getElementById('statOffdaysVal').textContent = '팀누리 D-59';
+      document.getElementById('statOffdaysLbl').textContent = '가장 빠른 오픈 (1/10 09:00)';
+      document.getElementById('statSTierVal').textContent = `${Object.keys(userStrategy).length}척`;
+      document.getElementById('statSTierLbl').textContent = '작전 수립 선사';
+
+      currentFilter = 'openrun';
+      applyFilter();
+      renderStrategySection();
+      return;
+    }
+
+    const activeData = getSeasonData();
+
     if (season === 'jeju') {
       if (eyebrowEl) eyebrowEl.textContent = '제주 서부(한림·신창·차귀도) 151일 심해갑 캘린더';
       if (titleEl) titleEl.textContent = '2027 상반기 제주 심해갑오징어 예약 추천일';
@@ -2374,6 +2696,7 @@
       document.getElementById('btnFilterTop15').textContent = '🏆 제주 주말·연휴 TOP 15';
 
       currentMonth = '2027-01';
+      currentFilter = 'all';
     } else {
       if (eyebrowEl) eyebrowEl.textContent = '서해 경기만(영흥·대부·궁평·오천) 91일 쭈갑 캘린더';
       if (titleEl) titleEl.textContent = '2027 가을 서해 쭈갑시즌 예약 추천일';
@@ -2391,6 +2714,7 @@
       document.getElementById('btnFilterTop15').textContent = '🏆 주말·연휴 TOP 15';
 
       currentMonth = '2027-09';
+      currentFilter = 'all';
     }
 
     renderMonthNav();
@@ -2439,6 +2763,7 @@
       candView.style.display = 'none';
       if (openrunView) {
         openrunView.style.display = 'block';
+        renderStrategySection();
         renderOpenrunView();
       }
       return;
@@ -3099,6 +3424,411 @@
   }
 
   /* ==========================================================================
+     🎯 2027 쭈갑 오픈런 선사 예약 작전판 (StrategyEngine)
+     ========================================================================== */
+  const STRATEGY_STORAGE_KEY = 'hojak_open_strategy_2027';
+  let userStrategy = {};
+  let openShipsList = [];
+  let strategySyncDebounceTimer = null;
+
+  const DEFAULT_OPEN_SHIPS = [
+    {
+      id: 'teamnuri',
+      ship_name: '팀누리호',
+      port: '영흥도 진두항',
+      platform: 'thefishing',
+      platform_name: '더피싱',
+      ship_id: '6149',
+      open_datetime: '2027-01-10T09:00:00+09:00',
+      open_date_str: '2027년 1월 10일 (일) 09:00',
+      booking_url: 'http://xn--od1b68lz1wi4c.kr',
+      capacity: 15,
+      good_seats: ['좌현 8 (최선수)', '우현 1 (최선수)', '좌현 15 (최선미)', '좌현 7', '좌현 9', '우현 2'],
+      good_seats_desc: '좌현 8(최선수) ➔ 1(우현최선수) ➔ 15(최선미) ➔ 7 ➔ 9 ➔ 2',
+      tip: '영흥도권 최고 인기선사로 1분 컷 마감 예상. 사전 로그인 및 좌석 번호 암기 필수!'
+    },
+    {
+      id: 'titan',
+      ship_name: '타이탄호',
+      port: '화성 궁평항',
+      platform: 'thefishing',
+      platform_name: '더피싱',
+      ship_id: '3070',
+      open_datetime: '2027-03-01T12:00:00+09:00',
+      open_date_str: '2027년 3월 1일 (월) 12:00',
+      booking_url: 'http://kungpyeong.com',
+      capacity: 20,
+      good_seats: ['우현 1 (최선수)', '좌현 20 (최선수)', '우현 10 (선미)', '좌현 11 (선미)'],
+      good_seats_desc: '우현 1(최선수) ➔ 좌현 20(최선수) ➔ 우현 10(선미) ➔ 좌현 11(선미)',
+      tip: '수심 7m 안팎 얕은 여밭 공략 탁월. 정오 12시 오픈이므로 11시 50분 세션 대기 필수!'
+    },
+    {
+      id: 'black',
+      ship_name: '블랙호',
+      port: '화성 궁평항',
+      platform: 'thefishing',
+      platform_name: '더피싱',
+      ship_id: '4393',
+      open_datetime: '2027-03-01T12:00:00+09:00',
+      open_date_str: '2027년 3월 1일 (월) 12:00',
+      booking_url: 'http://kungpyeong.com',
+      capacity: 20,
+      good_seats: ['우현 1 (최선수)', '좌현 20 (최선수)', '우현 10 (선미)', '좌현 11 (선미)'],
+      good_seats_desc: '우현 1(최선수) ➔ 좌현 20(최선수) ➔ 우현 10(선미) ➔ 좌현 11(선미)',
+      tip: '화성방조제 왕쭈꾸미 포인트 명선박. 타이탄호와 동시 오픈이므로 동행자와 타겟 분담 추천!'
+    }
+  ];
+
+  function initStrategyEngine() {
+    if (window.ALL_DATA && Array.isArray(window.ALL_DATA.open_schedules) && window.ALL_DATA.open_schedules.length > 0) {
+      openShipsList = window.ALL_DATA.open_schedules;
+    } else {
+      openShipsList = DEFAULT_OPEN_SHIPS.slice();
+    }
+
+    try {
+      const saved = localStorage.getItem(STRATEGY_STORAGE_KEY);
+      if (saved) {
+        userStrategy = JSON.parse(saved);
+      }
+    } catch(e) {
+      userStrategy = {};
+    }
+
+    syncStrategyWithServer(false);
+  }
+
+  async function syncStrategyWithServer(showToastMsg = false) {
+    try {
+      const resp = await fetch('/api/strategy/2027', { signal: AbortSignal.timeout(3500) });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.open_schedules && data.open_schedules.length > 0) {
+          openShipsList = data.open_schedules;
+        }
+        if (data.user_strategy && typeof data.user_strategy === 'object') {
+          userStrategy = Object.assign({}, userStrategy, data.user_strategy);
+          try {
+            localStorage.setItem(STRATEGY_STORAGE_KEY, JSON.stringify(userStrategy));
+          } catch(e) {}
+        }
+        renderStrategySection();
+        if (showToastMsg) showToast('☁️ N100 홈서버 및 위키 작전표 동기화 완료!');
+      }
+    } catch(e) {
+      if (showToastMsg) showToast('⚠️ 오프라인 모드: 로컬 브라우저에 안전 보존 중');
+    }
+  }
+
+  function saveStrategyToStorage(immediate = false) {
+    try {
+      localStorage.setItem(STRATEGY_STORAGE_KEY, JSON.stringify(userStrategy));
+    } catch(e) {}
+
+    if (strategySyncDebounceTimer) clearTimeout(strategySyncDebounceTimer);
+    const delay = immediate ? 0 : 300;
+    strategySyncDebounceTimer = setTimeout(async () => {
+      try {
+        await fetch('/api/strategy/2027', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            strategy: userStrategy,
+            open_schedules: openShipsList
+          }),
+          signal: AbortSignal.timeout(4500)
+        });
+      } catch(e) {}
+    }, delay);
+  }
+
+  function renderStrategySection() {
+    const mount = document.getElementById('strategyCardMount');
+    if (!mount) return;
+
+    if (!openShipsList || openShipsList.length === 0) {
+      mount.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-dim); background:var(--surface); border-radius:12px; border:1px solid var(--line);">등록된 오픈런 선사가 없습니다. [➕ 오픈선사 직접 등록] 버튼을 눌러 추가하세요.</div>';
+      return;
+    }
+
+    const westDays = (window.ALL_DATA && window.ALL_DATA.west && window.ALL_DATA.west.days) || [];
+    const dayMap = {};
+    westDays.forEach(d => { dayMap[d.date] = d; });
+
+    let cardsHtml = '';
+    openShipsList.forEach((ship, sIdx) => {
+      const sid = ship.id || `ship_${sIdx}`;
+      const strat = userStrategy[sid] || { status: 'planned', targets: [], checklist: {} };
+      const targets = strat.targets || [];
+      const checklist = strat.checklist || {};
+      const statusCode = strat.status || 'planned';
+
+      const openDt = ship.open_datetime || '';
+      const openDtStr = ship.open_date_str || openDt.replace('T', ' ').slice(0, 16);
+      const bookingUrl = ship.booking_url || '#';
+      const goodSeats = ship.good_seats || [];
+      const tipText = ship.tip || '';
+      const platformName = ship.platform_name || (ship.platform === 'thefishing' ? '더피싱' : (ship.platform === 'sunsang24' ? '선상24' : '자체/수기'));
+      const shipIdBadge = ship.ship_id ? `ID ${escapeHtml(ship.ship_id)}` : '';
+
+      cardsHtml += `
+        <div class="strategy-card status-${statusCode}" id="strategyCard_${sid}">
+          <div class="strategy-card-top">
+            <div>
+              <div class="strategy-ship-title">
+                <span>⚓ ${escapeHtml(ship.ship_name)}</span>
+                <span class="port-tag">📍 ${escapeHtml(ship.port || '서해')}</span>
+                <span class="tag-platform">${escapeHtml(platformName)} ${shipIdBadge}</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">
+                정원: <b>${ship.capacity || 20}석</b> · 좌석 배정: <b>${ship.platform === 'thefishing' ? '사전 좌석지정' : '현장추첨/배정'}</b>
+              </div>
+            </div>
+            <div>
+              <select class="strategy-status-select" onchange="updateShipStatus('${sid}', this.value)">
+                <option value="planned" ${statusCode === 'planned' ? 'selected' : ''}>🎯 작전수립중</option>
+                <option value="booked" ${statusCode === 'booked' ? 'selected' : ''}>🎉 예약완료</option>
+                <option value="failed" ${statusCode === 'failed' ? 'selected' : ''}>⚠️ 예약실패</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="strategy-timer-row">
+            <div>
+              <div style="font-size:11.5px; color:var(--text-dim); margin-bottom:3px;">
+                ⏰ 예약 오픈 일시: <b>${escapeHtml(openDtStr)}</b>
+              </div>
+              <div class="strategy-timer-val num countdown-val" data-target="${escapeHtml(openDt)}">
+                계산 중...
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <a href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener" class="btn-booking-direct">
+                🚀 선사 예약 사이트 바로가기
+              </a>
+              <button type="button" class="btn-boat-edit" onclick="openScheduleModal('${escapeHtml(ship.ship_name)}', '${escapeHtml(openDt)}', '${escapeHtml(ship.port || '')}')">수정</button>
+            </div>
+          </div>
+
+          ${tipText ? `
+            <div style="font-size:12.5px; color:var(--accent); background:rgba(227,169,76,0.08); padding:8px 12px; border-radius:8px; border-left:3px solid var(--accent);">
+              💡 <b>공략 팁</b>: ${escapeHtml(tipText)}
+            </div>
+          ` : ''}
+
+          <div class="strategy-seats-section">
+            <div class="strategy-section-label">
+              🏆 <b>황금 명당 좌석 추천 순위</b> (우선순위 순서대로 선점 권장)
+            </div>
+            <div class="seats-chip-list">
+              ${goodSeats.map((seat, idx) => `
+                <span class="seat-chip ${idx === 0 ? 'priority-1' : ''}">
+                  ${idx + 1}순위: ${escapeHtml(seat)}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="strategy-targets-section">
+            <div class="strategy-section-label">
+              🎯 <b>공략 타겟 출조일 플래너</b> (오픈 시 우선적으로 선점할 날짜 및 채비 계획)
+            </div>
+            <div class="targets-grid">
+              ${[1, 2, 3].map(rank => {
+                const t = targets.find(item => item.rank === rank) || { rank, date: '', species: 'jjuk', seat_memo: '', notes: '' };
+                const dayInfo = dayMap[t.date] || {};
+                const tideBadge = dayInfo.tide_name ? `${dayInfo.weekday} / ${dayInfo.tide_name}` : '';
+                const tierBadge = dayInfo.tier ? `${dayInfo.tier}등급` : '';
+
+                return `
+                  <div class="target-rank-card rank-${rank}">
+                    <div class="target-rank-header">
+                      <span class="rank-badge r${rank}">${rank}순위 타겟일</span>
+                      <span style="font-size:11px; color:var(--text-dim);">${rank === 1 ? '🌟 최우선 공략' : (rank === 2 ? '차선 대안' : '백업 옵션')}</span>
+                    </div>
+
+                    <div>
+                      <select class="target-select-date" onchange="updateTargetField('${sid}', ${rank}, 'date', this.value)">
+                        <option value="">-- 출조일 선택 --</option>
+                        ${buildDateSelectOptions(t.date)}
+                      </select>
+                    </div>
+
+                    <div class="target-meta-chip" id="targetMetaChip_${sid}_${rank}">
+                      ${t.date ? `
+                        <span>📅 ${escapeHtml(tideBadge)}</span>
+                        ${tierBadge ? `<span style="color:var(--accent); font-weight:700;">${tierBadge}</span>` : ''}
+                      ` : '<span style="color:var(--text-dim);">날짜를 선택하세요</span>'}
+                    </div>
+
+                    <div class="target-input-row">
+                      <button type="button" class="target-species-btn ${t.species === 'jjuk' ? 'active' : ''}" onclick="updateTargetField('${sid}', ${rank}, 'species', 'jjuk')">🐙 쭈꾸미</button>
+                      <button type="button" class="target-species-btn ${t.species === 'gap' ? 'active' : ''}" onclick="updateTargetField('${sid}', ${rank}, 'species', 'gap')">🦑 갑오징어</button>
+                      <button type="button" class="target-species-btn ${t.species === 'both' ? 'active' : ''}" onclick="updateTargetField('${sid}', ${rank}, 'species', 'both')">🐙🦑 쭈갑</button>
+                    </div>
+
+                    <div>
+                      <input type="text" class="target-input-text" placeholder="선호 좌석 (예: 8번 좌현최선수)" value="${escapeHtml(t.seat_memo || '')}" onchange="updateTargetField('${sid}', ${rank}, 'seat_memo', this.value)">
+                    </div>
+
+                    <div>
+                      <input type="text" class="target-input-text" placeholder="전략 메모 (예: 추석연휴 황금물때)" value="${escapeHtml(t.notes || '')}" onchange="updateTargetField('${sid}', ${rank}, 'notes', this.value)">
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="strategy-checklist-section">
+            <div class="strategy-section-label">
+              📋 <b>오픈런 당일 4대 체크리스트</b>
+            </div>
+            <div class="checklist-items">
+              <label class="checklist-item">
+                <input type="checkbox" ${checklist.logged_in ? 'checked' : ''} onchange="updateChecklist('${sid}', 'logged_in', this.checked)">
+                <span>10분 전 사전 로그인 세션 확인</span>
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" ${checklist.time_synced ? 'checked' : ''} onchange="updateChecklist('${sid}', 'time_synced', this.checked)">
+                <span>표준 시계(초 단위) 동기화 완료</span>
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" ${checklist.seat_memorized ? 'checked' : ''} onchange="updateChecklist('${sid}', 'seat_memorized', this.checked)">
+                <span>우선순위 좌석 번호 암기 완료</span>
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" ${checklist.booking_success ? 'checked' : ''} onchange="updateChecklist('${sid}', 'booking_success', this.checked)">
+                <span style="${checklist.booking_success ? 'color:#10b981; font-weight:700;' : ''}">🎉 예약 성공 완료</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    mount.innerHTML = cardsHtml;
+    updateCountdownTimers();
+  }
+
+  function buildDateSelectOptions(selectedDate) {
+    const westDays = (window.ALL_DATA && window.ALL_DATA.west && window.ALL_DATA.west.days) || [];
+    let html = '';
+
+    if (candidateDates && candidateDates.length > 0) {
+      const candWest = candidateDates.filter(d => d.startsWith('2027-09') || d.startsWith('2027-10') || d.startsWith('2027-11'));
+      if (candWest.length > 0) {
+        html += '<optgroup label="📌 나의 예약 후보일">';
+        candWest.forEach(dStr => {
+          const info = westDays.find(d => d.date === dStr) || {};
+          const label = `${dStr} (${info.weekday || ''}, ${info.tide_name || ''}${info.holiday_name ? ' ' + info.holiday_name : ''})`;
+          html += `<option value="${dStr}" ${dStr === selectedDate ? 'selected' : ''}>${label}</option>`;
+        });
+        html += '</optgroup>';
+      }
+    }
+
+    ['2027-09', '2027-10', '2027-11'].forEach(ym => {
+      const monthDays = westDays.filter(d => d.date.startsWith(ym));
+      const monthTitle = ym === '2027-09' ? '🗓️ 9월 (시즌 개막·추석연휴)' : (ym === '2027-10' ? '🗓️ 10월 (피크·한글날연휴)' : '🗓️ 11월 (신발짝 대물)');
+      html += `<optgroup label="${monthTitle}">`;
+      monthDays.forEach(d => {
+        const star = d.tier === 'S' ? '🌟 ' : (d.tier === 'A' ? '✨ ' : '');
+        const label = `${star}${d.date} (${d.weekday}, ${d.tide_name}${d.holiday_name ? ' · ' + d.holiday_name : ''})`;
+        html += `<option value="${d.date}" ${d.date === selectedDate ? 'selected' : ''}>${label}</option>`;
+      });
+      html += '</optgroup>';
+    });
+
+    return html;
+  }
+
+  function updateTargetField(shipId, rank, field, value) {
+    if (!userStrategy[shipId]) {
+      userStrategy[shipId] = { status: 'planned', targets: [], checklist: {} };
+    }
+    if (!userStrategy[shipId].targets) {
+      userStrategy[shipId].targets = [];
+    }
+    let target = userStrategy[shipId].targets.find(t => t.rank === rank);
+    if (!target) {
+      target = { rank, date: '', species: 'jjuk', seat_memo: '', notes: '' };
+      userStrategy[shipId].targets.push(target);
+    }
+    target[field] = value;
+
+    if (field === 'date') {
+      const westDays = (window.ALL_DATA && window.ALL_DATA.west && window.ALL_DATA.west.days) || [];
+      const dayInfo = westDays.find(d => d.date === value) || {};
+      const chipEl = document.getElementById(`targetMetaChip_${shipId}_${rank}`);
+      if (chipEl) {
+        if (value && dayInfo.tide_name) {
+          chipEl.innerHTML = `<span>📅 ${dayInfo.weekday} / ${dayInfo.tide_name}</span>${dayInfo.tier ? `<span style="color:var(--accent); font-weight:700;">${dayInfo.tier}등급</span>` : ''}`;
+        } else {
+          chipEl.innerHTML = '<span style="color:var(--text-dim);">날짜를 선택하세요</span>';
+        }
+      }
+    }
+
+    if (field === 'species') {
+      const card = document.getElementById(`strategyCard_${shipId}`);
+      if (card) {
+        const rankCard = card.querySelectorAll('.target-rank-card')[rank - 1];
+        if (rankCard) {
+          rankCard.querySelectorAll('.target-species-btn').forEach(b => {
+            const isMatch = (value === 'jjuk' && b.textContent.includes('쭈꾸미')) ||
+                            (value === 'gap' && b.textContent.includes('갑오징어')) ||
+                            (value === 'both' && b.textContent.includes('쭈갑'));
+            b.classList.toggle('active', isMatch);
+          });
+        }
+      }
+    }
+
+    saveStrategyToStorage();
+  }
+
+  function updateChecklist(shipId, key, checked) {
+    if (!userStrategy[shipId]) {
+      userStrategy[shipId] = { status: 'planned', targets: [], checklist: {} };
+    }
+    if (!userStrategy[shipId].checklist) {
+      userStrategy[shipId].checklist = {};
+    }
+    userStrategy[shipId].checklist[key] = checked;
+
+    if (key === 'booking_success') {
+      if (checked) {
+        userStrategy[shipId].status = 'booked';
+        updateShipStatus(shipId, 'booked');
+      } else {
+        if (userStrategy[shipId].status === 'booked') {
+          userStrategy[shipId].status = 'planned';
+          updateShipStatus(shipId, 'planned');
+        }
+      }
+    }
+
+    saveStrategyToStorage();
+  }
+
+  function updateShipStatus(shipId, status) {
+    if (!userStrategy[shipId]) {
+      userStrategy[shipId] = { status, targets: [], checklist: {} };
+    }
+    userStrategy[shipId].status = status;
+
+    const card = document.getElementById(`strategyCard_${shipId}`);
+    if (card) {
+      card.className = `strategy-card status-${status}`;
+      const sel = card.querySelector('.strategy-status-select');
+      if (sel) sel.value = status;
+    }
+
+    saveStrategyToStorage();
+  }
+
+  /* ==========================================================================
      🚀 2027 선사 예약 오픈런 모니터링 및 수기 일정 등록 클라이언트 로직
      ========================================================================== */
 
@@ -3279,17 +4009,26 @@
       const targetStr = el.dataset.target;
       if (!targetStr) return;
 
-      const targetTime = new Date(targetStr.replace(' ', 'T') + ':00').getTime();
-      const diff = targetTime - now;
+      let targetTime = NaN;
+      if (targetStr.includes('T')) {
+        targetTime = new Date(targetStr).getTime();
+      } else if (targetStr.includes(' ')) {
+        targetTime = new Date(targetStr.replace(' ', 'T') + ':00+09:00').getTime();
+      } else {
+        targetTime = new Date(targetStr).getTime();
+      }
 
       if (isNaN(targetTime)) {
         el.textContent = targetStr;
         return;
       }
 
+      const diff = targetTime - now;
+
       if (diff <= 0) {
         el.textContent = '🎉 오픈 완료 (예약 진행 중)';
         el.classList.add('passed');
+        el.classList.remove('urgent');
         return;
       }
 
@@ -3304,6 +4043,12 @@
       const sStr = String(secs).padStart(2, '0');
 
       el.textContent = `D-${days} ${hStr}:${mStr}:${sStr}`;
+
+      if (diff < 24 * 60 * 60 * 1000) {
+        el.classList.add('urgent');
+      } else {
+        el.classList.remove('urgent');
+      }
     });
   }
 
@@ -3392,6 +4137,10 @@
     const customInput = document.getElementById('modalCustomBoatName');
     const dateInput = document.getElementById('modalOpenDate');
     const timeInput = document.getElementById('modalOpenTime');
+    const portInput = document.getElementById('modalPort');
+    const platformSelect = document.getElementById('modalPlatform');
+    const siteUrlInput = document.getElementById('modalSiteUrl');
+    const goodSeatsInput = document.getElementById('modalGoodSeats');
     const sourceSelect = document.getElementById('modalSourceSelect');
     const submitBtn = document.getElementById('btnSubmitOpenSchedule');
 
@@ -3409,7 +4158,11 @@
     }
 
     const openDatetime = `${dateVal} ${timeVal}`;
-    const sourceVal = sourceSelect.value;
+    const sourceVal = sourceSelect ? sourceSelect.value : '사용자수기';
+    const portVal = portInput ? portInput.value.trim() : '';
+    const platformVal = platformSelect ? platformSelect.value : 'thefishing';
+    const siteUrlVal = siteUrlInput ? siteUrlInput.value.trim() : '';
+    const goodSeatsVal = goodSeatsInput ? goodSeatsInput.value.trim() : '';
 
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -3417,7 +4170,8 @@
     }
 
     try {
-      const res = await fetch(REGISTER_BOOKING_API_URL, {
+      // 1. 레거시 예약 모니터링 API 등록
+      fetch(REGISTER_BOOKING_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3426,21 +4180,51 @@
           source: sourceVal
         }),
         signal: AbortSignal.timeout(4500)
-      });
+      }).catch(e => console.warn('[submitOpenSchedule] booking API error:', e));
 
-      if (res.ok) {
-        const resData = await res.json();
-        if (resData.ok) {
-          showToast(`✅ [${resData.name}] 오픈일정이 성공적으로 저장되었습니다!`);
-          closeScheduleModal();
-          await fetchBookingSchedules(false);
-          return;
+      // 2. 오픈런 작전판 선사 목록 (openShipsList) 갱신
+      let existingShip = openShipsList.find(s => s.ship_name === boatName || s.name === boatName);
+      const seatsArr = goodSeatsVal ? goodSeatsVal.split(/[,➔>]/).map(s => s.trim()).filter(Boolean) : [];
+
+      if (existingShip) {
+        existingShip.open_datetime = openDatetime.replace(' ', 'T') + ':00+09:00';
+        existingShip.open_date_str = openDatetime;
+        if (portVal) existingShip.port = portVal;
+        if (platformVal) existingShip.platform = platformVal;
+        if (siteUrlVal) existingShip.booking_url = siteUrlVal;
+        if (seatsArr.length > 0) {
+          existingShip.good_seats = seatsArr;
+          existingShip.good_seats_desc = goodSeatsVal;
         }
+      } else {
+        const newId = boatName.toLowerCase().replace(/[^a-z0-9]/g, '') || `ship_${Date.now()}`;
+        openShipsList.push({
+          id: newId,
+          ship_name: boatName,
+          port: portVal || '서해',
+          platform: platformVal,
+          platform_name: platformVal === 'thefishing' ? '더피싱' : (platformVal === 'sunsang24' ? '선상24' : '자체/수기'),
+          ship_id: '',
+          open_datetime: openDatetime.replace(' ', 'T') + ':00+09:00',
+          open_date_str: openDatetime,
+          booking_url: siteUrlVal || '#',
+          capacity: 20,
+          good_seats: seatsArr.length > 0 ? seatsArr : ['우현 1 (최선수)', '좌현 1 (최선수)'],
+          good_seats_desc: goodSeatsVal || '선수 1번 / 선미 좌석 추천',
+          tip: '오픈런 전용 등록 선사'
+        });
       }
-      showToast('⚠️ 일정 저장에 실패했습니다. 서버 상태를 확인해주세요.');
+
+      // 3. N100 서버 및 위키 저장 (즉시)
+      saveStrategyToStorage(true);
+      renderStrategySection();
+
+      showToast(`✅ [${boatName}] 오픈일정 및 작전이 성공적으로 저장되었습니다!`);
+      closeScheduleModal();
+      await fetchBookingSchedules(false);
     } catch(e) {
       console.error('[submitOpenSchedule] error:', e);
-      showToast(`⚠️ 서버 통신 오류: ${e.message}`);
+      showToast(`⚠️ 오류 발생: ${e.message}`);
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -3467,14 +4251,17 @@
 
   // 앱 초기화 진입점 (DOM 준비 상태 방어)
   function initApp() {
+    // 🎯 2027 쭈갑 오픈런 작전판 엔진 초기화
+    initStrategyEngine();
+
     // 마지막 저장된 시즌 선호도 또는 URL 파라미터 복원
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const urlSeason = urlParams.get('season');
       const savedSeason = localStorage.getItem(SEASON_STORAGE_KEY);
-      if (urlSeason && (urlSeason === 'jeju' || urlSeason === 'west')) {
+      if (urlSeason && (urlSeason === 'jeju' || urlSeason === 'west' || urlSeason === 'strategy')) {
         currentSeason = urlSeason;
-      } else if (savedSeason && (savedSeason === 'jeju' || savedSeason === 'west')) {
+      } else if (savedSeason && (savedSeason === 'jeju' || savedSeason === 'west' || savedSeason === 'strategy')) {
         currentSeason = savedSeason;
       }
     } catch(e) {}
@@ -3502,6 +4289,7 @@
         fetchServerCandidates();
         fetchBookingSchedules();
         fetchConfirmedBookings(true);
+        syncStrategyWithServer(true);
       });
     }
   }

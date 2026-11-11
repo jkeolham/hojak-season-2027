@@ -1,6 +1,6 @@
 {
-  "name": "2027 쭈갑·심해갑 시즌 예약 추천일 — Hojak",
-  "short_name": "2027 쭈갑·심해갑",
+  "name": "2027 쭈갑·심해갑 시즌 예약 추천일 & 오픈런 작전판 — Hojak",
+  "short_name": "2027 쭈갑작전판",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1620",

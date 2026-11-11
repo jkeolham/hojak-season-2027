@@ -1,0 +1,68 @@
+{
+  "updated_at": "2026-11-11T16:25:00+09:00",
+  "season": "2027 서해 쭈갑",
+  "ships": [
+    {
+      "id": "teamnuri",
+      "ship_name": "팀누리호",
+      "port": "영흥도 진두항",
+      "platform": "thefishing",
+      "platform_name": "더피싱",
+      "ship_id": "6149",
+      "open_datetime": "2027-01-10T09:00:00+09:00",
+      "open_date_str": "2027년 1월 10일 (일) 09:00",
+      "booking_url": "http://xn--od1b68lz1wi4c.kr",
+      "capacity": 15,
+      "good_seats": [
+        "좌현 8 (최선수)",
+        "우현 1 (최선수)",
+        "좌현 15 (최선미)",
+        "좌현 7",
+        "좌현 9",
+        "우현 2"
+      ],
+      "good_seats_desc": "좌현 8(최선수) ➔ 1(우현최선수) ➔ 15(최선미) ➔ 7 ➔ 9 ➔ 2",
+      "tip": "영흥도권 최고 인기선사로 1분 컷 마감 예상. 사전 로그인 및 좌석 번호 암기 필수!"
+    },
+    {
+      "id": "titan",
+      "ship_name": "타이탄호",
+      "port": "화성 궁평항",
+      "platform": "thefishing",
+      "platform_name": "더피싱",
+      "ship_id": "3070",
+      "open_datetime": "2027-03-01T12:00:00+09:00",
+      "open_date_str": "2027년 3월 1일 (월) 12:00",
+      "booking_url": "http://kungpyeong.com",
+      "capacity": 20,
+      "good_seats": [
+        "우현 1 (최선수)",
+        "좌현 20 (최선수)",
+        "우현 10 (선미)",
+        "좌현 11 (선미)"
+      ],
+      "good_seats_desc": "우현 1(최선수) ➔ 좌현 20(최선수) ➔ 우현 10(선미) ➔ 좌현 11(선미)",
+      "tip": "수심 7m 안팎 얕은 여밭 공략 탁월. 정오 12시 오픈이므로 11시 50분 세션 대기 필수!"
+    },
+    {
+      "id": "black",
+      "ship_name": "블랙호",
+      "port": "화성 궁평항",
+      "platform": "thefishing",
+      "platform_name": "더피싱",
+      "ship_id": "4393",
+      "open_datetime": "2027-03-01T12:00:00+09:00",
+      "open_date_str": "2027년 3월 1일 (월) 12:00",
+      "booking_url": "http://kungpyeong.com",
+      "capacity": 20,
+      "good_seats": [
+        "우현 1 (최선수)",
+        "좌현 20 (최선수)",
+        "우현 10 (선미)",
+        "좌현 11 (선미)"
+      ],
+      "good_seats_desc": "우현 1(최선수) ➔ 좌현 20(최선수) ➔ 우현 10(선미) ➔ 좌현 11(선미)",
+      "tip": "화성방조제 왕쭈꾸미 포인트 명선박. 타이탄호와 동시 오픈이므로 동행자와 타겟 분담 추천!"
+    }
+  ]
+}

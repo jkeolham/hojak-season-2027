@@ -12,14 +12,15 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 DATA_JSON_WEST = BASE_DIR / "data" / "season_2027_recommend.json"
 DATA_JSON_JEJU = BASE_DIR / "data" / "season_2027_jeju_recommend.json"
+DATA_JSON_OPEN = BASE_DIR / "data" / "open_schedules.json"
 TEMPLATE_HTML = BASE_DIR / "template.html"
 INDEX_HTML = BASE_DIR / "index.html"
 MANIFEST_JSON = BASE_DIR / "manifest.json"
 
 def build_manifest():
     manifest = {
-        "name": "2027 쭈갑·심해갑 시즌 예약 추천일 — Hojak",
-        "short_name": "2027 쭈갑·심해갑",
+        "name": "2027 쭈갑·심해갑 시즌 예약 추천일 & 오픈런 작전판 — Hojak",
+        "short_name": "2027 쭈갑작전판",
         "start_url": "./index.html",
         "display": "standalone",
         "background_color": "#0f1620",
@@ -52,10 +53,19 @@ def build_html():
     with open(DATA_JSON_JEJU, "r", encoding="utf-8") as f:
         data_jeju = json.load(f)
 
+    open_schedules = []
+    if DATA_JSON_OPEN.exists():
+        try:
+            with open(DATA_JSON_OPEN, "r", encoding="utf-8") as f:
+                open_schedules = json.load(f).get("ships", [])
+        except Exception as e:
+            print(f"[build 경고] open_schedules.json 읽기 실패: {e}")
+
     # 통합 데이터 패키징
     combined_data = {
         "west": data_west,
-        "jeju": data_jeju
+        "jeju": data_jeju,
+        "open_schedules": open_schedules
     }
         
     with open(TEMPLATE_HTML, "r", encoding="utf-8") as f:
