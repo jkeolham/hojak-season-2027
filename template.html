@@ -423,6 +423,9 @@
     max-width: 100%;
     box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   }
+  .booked-badge.is-pending {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+  }
   .holiday-tag {
     font-size: 9.5px;
     font-weight: 600;
@@ -2712,7 +2715,12 @@
 
       const trip = bookedTripsData[d.date];
       const boatTitle = trip ? (trip.boat_name || trip.ship_name || '선사') : '';
-      const bookedTag = trip ? `<span style="font-size:11px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.18); border:1px solid rgba(16,185,129,0.4); padding:2px 7px; border-radius:4px; margin-left:6px;">🎉 예약완료: ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
+      const isPending = trip && (trip.status === '입금대기' || (trip.status && trip.status.includes('입금대기')));
+      const tagColor = isPending ? '#fbbf24' : '#34d399';
+      const tagBg = isPending ? 'rgba(245,158,11,0.18)' : 'rgba(16,185,129,0.18)';
+      const tagBorder = isPending ? 'rgba(245,158,11,0.4)' : 'rgba(16,185,129,0.4)';
+      const tagLabel = isPending ? '⏳ 입금대기' : '🎉 예약완료';
+      const bookedTag = trip ? `<span style="font-size:11px; font-weight:700; color:${tagColor}; background:${tagBg}; border:1px solid ${tagBorder}; padding:2px 7px; border-radius:4px; margin-left:6px;">${tagLabel}: ${escapeHtml(boatTitle)}${trip.seat ? ` ${escapeHtml(trip.seat)}` : ''}</span>` : '';
       const areaTag = isJejuDay ? '<span style="font-size:10.5px; color:#6ee7b7; background:rgba(16,185,129,0.15); padding:1px 5px; border-radius:4px; margin-right:4px;">제주</span>' : '<span style="font-size:10.5px; color:#93c5fd; background:rgba(59,130,246,0.15); padding:1px 5px; border-radius:4px; margin-right:4px;">서해</span>';
 
       const scoreMeta = isJejuDay ? 
@@ -3165,8 +3173,10 @@
         const tierIcon = d.tier === 'S' ? '🌟' : d.tier === 'A' ? '✨' : '';
         const rawBoat = trip ? (trip.boat_name || trip.ship_name || '예약완료') : '';
         const shortBoat = rawBoat.replace(/\(.*?\)/g, '').trim();
-        const fullDetail = `${rawBoat}${trip && trip.seat ? ' ' + trip.seat : ''}`;
-        const bookedBadgeHtml = trip ? `<span class="booked-badge" title="예약 완료: ${escapeHtml(fullDetail)}">🎉 ${escapeHtml(shortBoat)}</span>` : '';
+        const isPending = trip && (trip.status === '입금대기' || (trip.status && trip.status.includes('입금대기')));
+        const badgeIcon = isPending ? '⏳' : '🎉';
+        const fullDetail = `${rawBoat}${trip && trip.seat ? ' ' + trip.seat : ''}${isPending ? ' (입금대기)' : ''}`;
+        const bookedBadgeHtml = trip ? `<span class="booked-badge ${isPending ? 'is-pending' : ''}" title="${isPending ? '입금 대기: ' : '예약 완료: '}${escapeHtml(fullDetail)}">${badgeIcon} ${escapeHtml(shortBoat)}</span>` : '';
 
         const assignedList = typeof getAssignedShipsByDate === 'function' ? getAssignedShipsByDate(d.date) : [];
         let assignedBadgesHtml = '';
@@ -3430,8 +3440,9 @@
       if (manualBox) manualBox.style.display = 'none';
 
       const boatTitle = trip.boat_name || trip.ship_name || '선사';
-      if (titleEl) titleEl.textContent = `🎉 ${boatTitle} 예약 확정 (${trip.seat || '좌석 미정'})`;
-      if (subEl) subEl.textContent = trip.booking_id ? `예약번호: ${trip.booking_id} · N100 실시간 연동` : '출조 예약 완료 상태';
+      const isPending = trip.status === '입금대기' || (trip.status && trip.status.includes('입금대기'));
+      if (titleEl) titleEl.textContent = isPending ? `⏳ ${boatTitle} 예약 접수 (${trip.seat || '좌석 미정'})` : `🎉 ${boatTitle} 예약 확정 (${trip.seat || '좌석 미정'})`;
+      if (subEl) subEl.textContent = isPending ? '⚠️ 선비 입금 대기 상태 (선사 입금 확인 대기중)' : (trip.booking_id ? `예약번호: ${trip.booking_id} · N100 실시간 연동` : '출조 예약 완료 (입금 완료 상태)');
 
       const feeVal = trip.price || trip.total_fee;
       const feeStr = feeVal ? `${Number(feeVal).toLocaleString()}원` : '선비 금액 미입력';
@@ -3444,6 +3455,10 @@
             <span class="booked-grid-val">${escapeHtml(boatTitle)}</span>
           </div>
           <div class="booked-grid-item">
+            <span class="booked-grid-label">예약 상태</span>
+            <span class="booked-grid-val" style="color:${isPending ? '#fbbf24' : '#34d399'}; font-weight:700;">${isPending ? '⏳ 입금대기' : '🎉 예약완료(입금완료)'}</span>
+          </div>
+          <div class="booked-grid-item">
             <span class="booked-grid-label">지정 좌석</span>
             <span class="booked-grid-val" style="color:#34d399;">${escapeHtml(trip.seat || '미정')}</span>
           </div>
@@ -3451,7 +3466,7 @@
             <span class="booked-grid-label">선비 결제금액</span>
             <span class="booked-grid-val">${feeStr}</span>
           </div>
-          <div class="booked-grid-item">
+          <div class="booked-grid-item" style="grid-column: span 2;">
             <span class="booked-grid-label">입금계좌 / 선장</span>
             <span class="booked-grid-val">${escapeHtml(trip.bank_info || '-')}</span>
           </div>
@@ -3659,17 +3674,19 @@
         cell.classList.add('is-booked');
         const shipTitle = trip.boat_name || trip.ship_name || '예약확정';
         const cleanBoatName = shipTitle.replace(/\(.*?\)/g, '').trim();
-        const label = `🎉 ${cleanBoatName}`;
+        const isPending = trip.status === '입금대기' || (trip.status && trip.status.includes('입금대기'));
+        const badgeIcon = isPending ? '⏳' : '🎉';
+        const label = `${badgeIcon} ${cleanBoatName}`;
         if (!badge) {
           badge = document.createElement('span');
-          badge.className = 'booked-badge';
           const badgeContainer = cell.querySelector('.cell-badges');
           if (badgeContainer) {
             badgeContainer.prepend(badge);
           }
         }
+        badge.className = `booked-badge ${isPending ? 'is-pending' : ''}`;
         badge.textContent = label;
-        badge.title = `[예약 확정] ${shipTitle} (${trip.seat || '좌석 미정'}) - 클릭하여 상세 보기`;
+        badge.title = `${isPending ? '[입금 대기]' : '[예약 확정]'} ${shipTitle} (${trip.seat || '좌석 미정'})${isPending ? ' - 선비 입금 대기' : ''} - 클릭하여 상세 보기`;
       } else {
         cell.classList.remove('is-booked');
         if (badge) badge.remove();
