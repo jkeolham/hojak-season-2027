@@ -1,7 +1,29 @@
 {
-  "updated_at": "2026-11-11T16:40:00+09:00",
+  "updated_at": "2026-11-15T05:30:00+09:00",
   "season": "2027 서해 쭈갑",
   "ships": [
+    {
+      "id": "lurefishing",
+      "ship_name": "루어피싱호",
+      "port": "영흥도 진두항",
+      "platform": "thefishing",
+      "platform_name": "더피싱",
+      "ship_id": "2441",
+      "open_datetime": "2027-01-02T13:00:00+09:00",
+      "open_date_str": "2027년 1월 2일 (토) 13:00",
+      "booking_url": "http://yhdfish.net",
+      "capacity": 20,
+      "good_seats": [
+        "좌현 11 (최선수)",
+        "우현 1 (최선수)",
+        "좌현 20 (최선미)",
+        "우현 10 (선미)",
+        "좌현 12",
+        "우현 2"
+      ],
+      "good_seats_desc": "좌현 11(최선수) ➔ 1(우현최선수) ➔ 20(좌선미) ➔ 10(우선미) ➔ 12 ➔ 2",
+      "tip": "2027 서해 쭈갑 전체 선단 중 가장 먼저 예약이 열리는 제1호 오픈런 선사! 1월 2일 13:00 정각 광클 필수!"
+    },
     {
       "id": "teamnuri",
       "ship_name": "팀누리호",
