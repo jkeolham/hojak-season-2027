@@ -1,15 +1,4 @@
 {
-  "teamnuri": {
-    "status": "planned",
-    "targets": [
-      {
-        "date": "2027-09-02",
-        "species": "jjuk",
-        "seat_memo": "8번 좌현최선수",
-        "notes": "개막전"
-      }
-    ]
-  },
   "titan": {
     "status": "planned",
     "targets": [
