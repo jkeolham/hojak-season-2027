@@ -1,29 +1,4 @@
 {
-  "lurefishing": {
-    "status": "planned",
-    "targets": [
-      {
-        "date": "2027-09-01",
-        "species": "jjuk",
-        "seat_memo": "11번 좌현최선수",
-        "notes": "개막전"
-      }
-    ],
-    "assigned_dates": [
-      {
-        "date": "2027-09-01",
-        "memo": "개막전"
-      },
-      {
-        "date": "2027-09-04",
-        "memo": "첫주말"
-      },
-      {
-        "date": "2027-09-11",
-        "memo": "황금물돌이"
-      }
-    ]
-  },
   "teamnuri": {
     "status": "planned",
     "targets": [
