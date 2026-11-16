@@ -3712,6 +3712,22 @@
 
   const DEFAULT_OPEN_SHIPS = [
     {
+      id: 'myeongseong',
+      ship_name: '명성호',
+      port: '영흥도 진두항',
+      platform: 'thefishing',
+      platform_name: '더피싱',
+      ship_id: '1685',
+      open_datetime: '2026-12-30T12:00:00+09:00',
+      open_date_str: '2026년 12월 30일 (수) 낮 12:00',
+      booking_url: 'http://xn--hq1b31ko5fzpfdsxrtb.com',
+      capacity: 20,
+      has_seat: false,
+      good_seats: ['좌석 미지정제 (인원 예약)'],
+      good_seats_desc: '○ 좌석 미지정 (승선 인원수 예약, 현장 배정)',
+      tip: '2027 서해 쭈갑 전체 선단 중 가장 먼저 예약이 열리는 전체 제1호 오픈런! 좌석 선택 없이 인원수만 입력하여 신속 체결 필수!'
+    },
+    {
       id: 'teamnuri',
       ship_name: '팀누리호',
       port: '영흥도 진두항',
@@ -4075,7 +4091,7 @@
                 <span class="assigned-count-pill" id="assignedPill_${sid}">총 ${assignedList.length}일 배정</span>
               </div>
               <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">
-                정원: <b>${ship.capacity || 20}석</b> · 좌석 배정: <b>${ship.platform === 'thefishing' ? '사전 좌석지정' : '현장추첨/배정'}</b>
+                정원: <b>${ship.capacity || 20}석</b> · 좌석 배정: <b>${ship.has_seat === false ? '좌석 미지정 (인원수 예약, 현장배정)' : (ship.platform === 'thefishing' ? '사전 좌석지정' : '현장추첨/배정')}</b>
               </div>
             </div>
             <div>
@@ -4112,15 +4128,21 @@
 
           <div class="strategy-seats-section">
             <div class="strategy-section-label">
-              🏆 <b>황금 명당 좌석 추천 순위</b> (우선순위 순서대로 선점 권장)
+              ${ship.has_seat === false ? '📋 <b>좌석 배정 방식</b>' : '🏆 <b>황금 명당 좌석 추천 순위</b> (우선순위 순서대로 선점 권장)'}
             </div>
-            <div class="seats-chip-list">
-              ${goodSeats.map((seat, idx) => `
-                <span class="seat-chip ${idx === 0 ? 'priority-1' : ''}">
-                  ${idx + 1}순위: ${escapeHtml(seat)}
-                </span>
-              `).join('')}
-            </div>
+            ${ship.has_seat === false ? `
+              <div style="font-size:12.5px; color:var(--text); background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; border:1px dashed var(--border-color); display:inline-block;">
+                ○ <b>좌석 미지정제</b> (승선 인원수 예약, 현장 배정)
+              </div>
+            ` : `
+              <div class="seats-chip-list">
+                ${goodSeats.map((seat, idx) => `
+                  <span class="seat-chip ${idx === 0 ? 'priority-1' : ''}">
+                    ${idx + 1}순위: ${escapeHtml(seat)}
+                  </span>
+                `).join('')}
+              </div>
+            `}
           </div>
 
           <div class="strategy-assigned-section">

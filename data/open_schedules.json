@@ -1,7 +1,25 @@
 {
-  "updated_at": "2026-11-16T14:40:00+09:00",
+  "updated_at": "2026-11-16T15:15:00+09:00",
   "season": "2027 서해 쭈갑",
   "ships": [
+    {
+      "id": "myeongseong",
+      "ship_name": "명성호",
+      "port": "영흥도 진두항",
+      "platform": "thefishing",
+      "platform_name": "더피싱",
+      "ship_id": "1685",
+      "open_datetime": "2026-12-30T12:00:00+09:00",
+      "open_date_str": "2026년 12월 30일 (수) 낮 12:00",
+      "booking_url": "http://xn--hq1b31ko5fzpfdsxrtb.com",
+      "capacity": 20,
+      "has_seat": false,
+      "good_seats": [
+        "좌석 미지정제 (인원 예약)"
+      ],
+      "good_seats_desc": "○ 좌석 미지정 (승선 인원수 예약, 현장 배정)",
+      "tip": "2027 서해 쭈갑 전체 선단 중 가장 먼저 예약이 열리는 전체 제1호 오픈런! 좌석 선택 없이 인원수만 입력하여 신속 체결 필수!"
+    },
     {
       "id": "teamnuri",
       "ship_name": "팀누리호",
